@@ -1,4 +1,4 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const getStripe = () => require('stripe')(process.env.STRIPE_SECRET_KEY);
 const pool = require('../config/db');
 const { enviarConfirmacionPedido } = require('../config/email');
 
@@ -36,7 +36,7 @@ const crearPaymentIntent = async (req, res) => {
     const total = subtotal + costo_envio;
 
     // Crear PaymentIntent en Stripe (en centavos)
-    const paymentIntent = await stripe.paymentIntents.create({
+    const paymentIntent = await getStripe().paymentIntents.create({
       amount: Math.round(total * 100),
       currency: 'cop',
       metadata: { usuario_id, carrito_id: carrito.rows[0].id }
@@ -79,7 +79,7 @@ const webhook = async (req, res) => {
   const sig = req.headers['stripe-signature'];
   let event;
   try {
-    event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+    event = getStripe().webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
   } catch (err) {
     return res.status(400).json({ error: `Webhook Error: ${err.message}` });
   }
@@ -148,7 +148,7 @@ const webhook = async (req, res) => {
 const confirmarPago = async (req, res) => {
   const { payment_intent_id } = req.body;
   try {
-    const intent = await stripe.paymentIntents.retrieve(payment_intent_id);
+    const intent = await getStripe().paymentIntents.retrieve(payment_intent_id);
     if (intent.status !== 'succeeded') {
       return res.status(400).json({ ok: false, mensaje: 'Pago no completado' });
     }
