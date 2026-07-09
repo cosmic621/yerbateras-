@@ -111,6 +111,7 @@ const login = async (req, res) => {
       usuario: { id: usuario.id, nombre: usuario.nombre, email: usuario.email, rol: usuario.rol, avatar_url: usuario.avatar_url }
     });
   } catch (err) {
+    console.error('ERROR LOGIN:', err);
     res.status(500).json({ ok: false, mensaje: 'Error al iniciar sesión' });
   }
 };
