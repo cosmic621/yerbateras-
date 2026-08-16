@@ -136,4 +136,152 @@ const enviarOtpEmail = async (email, nombre, otp) => {
   });
 };
 
-module.exports = { enviarEmailVerificacion, enviarConfirmacionPedido, enviarOtpEmail };
+// ─── Email: verificación de cita de masaje ────────────────
+const enviarVerificacionCita = async (email, nombre, token, cita) => {
+  const url = `${BASE_URL}/citas/verificar?token=${token}`;
+  const fecha = new Date(`${cita.fecha}T00:00:00`).toLocaleDateString('es-CO', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+  });
+  const html = htmlBase(`
+    <span class="badge">💆 Solicitud de cita</span>
+    <h2>Hola ${nombre}, confirma tu cita</h2>
+    <p>Recibimos tu solicitud para <strong>${cita.servicio_nombre}</strong>. Para asegurar tu horario, confírmala dentro de las próximas <strong>2 horas</strong>:</p>
+    <div style="background:#f0f7f0;border-radius:8px;padding:16px 20px;margin:20px 0">
+      <p style="margin:4px 0"><strong>📅 Fecha:</strong> ${fecha}</p>
+      <p style="margin:4px 0"><strong>🕐 Hora:</strong> ${cita.hora_inicio.slice(0,5)} - ${cita.hora_fin.slice(0,5)}</p>
+    </div>
+    <a href="${url}" class="btn">✅ Confirmar mi cita</a>
+    <hr class="divider">
+    <p style="font-size:13px;color:#888">Si no confirmas a tiempo, el horario quedará libre para otra persona. Si no solicitaste esta cita, ignora este mensaje.</p>
+  `);
+
+  await transporter.sendMail({
+    from: `"🌿 Yerbateras" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: '💆 Confirma tu cita de masaje — Yerbateras',
+    html
+  });
+};
+
+// ─── Email: cita confirmada (al CLIENTE) ──────────────────
+// Gratis y funciona siempre, sin depender de aprobaciones de WhatsApp Business.
+const enviarCitaConfirmadaCliente = async (email, nombre, cita) => {
+  const fecha = new Date(`${cita.fecha}T00:00:00`).toLocaleDateString('es-CO', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+  });
+  const html = htmlBase(`
+    <span class="badge">✅ Cita confirmada</span>
+    <h2>¡Listo, ${nombre}! Tu cita quedó confirmada</h2>
+    <div style="background:#f0f7f0;border-radius:8px;padding:16px 20px;margin:20px 0">
+      <p style="margin:4px 0"><strong>💆 Servicio:</strong> ${cita.servicio_nombre}</p>
+      <p style="margin:4px 0"><strong>📅 Fecha:</strong> ${fecha}</p>
+      <p style="margin:4px 0"><strong>🕐 Hora:</strong> ${cita.hora_inicio.slice(0,5)} - ${cita.hora_fin.slice(0,5)}</p>
+    </div>
+    <p>Te esperamos. Si necesitas cambiar tu horario, escríbenos.</p>
+    <hr class="divider">
+    <p style="font-size:13px;color:#888">Gracias por confiar en Yerbateras.</p>
+  `);
+
+  await transporter.sendMail({
+    from: `"🌿 Yerbateras" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: '✅ ¡Tu cita está confirmada! — Yerbateras',
+    html
+  });
+};
+
+// ─── Email: alerta de NUEVA cita (al NEGOCIO) ─────────────
+// Reemplaza la notificacion automatica de WhatsApp (que tiene costo y
+// requiere aprobacion de Meta) por un correo instantaneo y gratuito,
+// con un boton que abre WhatsApp directo con el cliente en un clic.
+const enviarAlertaCitaNegocio = async (emailNegocio, cita) => {
+  if (!emailNegocio) return;
+  const fecha = new Date(`${cita.fecha}T00:00:00`).toLocaleDateString('es-CO', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+  });
+  const telefonoLimpio = (cita.telefono_cliente || '').replace(/[^0-9]/g, '');
+  const mensajeWa = encodeURIComponent(`Hola ${cita.nombre_cliente}, te escribimos de Yerbateras por tu cita de ${cita.servicio_nombre} el ${fecha} a las ${cita.hora_inicio.slice(0,5)}.`);
+  const waUrl = `https://wa.me/${telefonoLimpio}?text=${mensajeWa}`;
+
+  const html = htmlBase(`
+    <span class="badge">🔔 Nueva cita agendada</span>
+    <h2>Tienes una nueva cita confirmada</h2>
+    <div style="background:#f0f7f0;border-radius:8px;padding:16px 20px;margin:20px 0">
+      <p style="margin:4px 0"><strong>💆 Servicio:</strong> ${cita.servicio_nombre}</p>
+      <p style="margin:4px 0"><strong>📅 Fecha:</strong> ${fecha}</p>
+      <p style="margin:4px 0"><strong>🕐 Hora:</strong> ${cita.hora_inicio.slice(0,5)} - ${cita.hora_fin.slice(0,5)}</p>
+      <p style="margin:4px 0"><strong>👤 Cliente:</strong> ${cita.nombre_cliente}</p>
+      <p style="margin:4px 0"><strong>📞 Teléfono:</strong> ${cita.telefono_cliente}</p>
+      <p style="margin:4px 0"><strong>✉️ Email:</strong> ${cita.email_cliente}</p>
+      ${cita.notas ? `<p style="margin:4px 0"><strong>📝 Notas:</strong> ${cita.notas}</p>` : ''}
+    </div>
+    <a href="${waUrl}" class="btn" style="background:#25D366">💬 Escribirle por WhatsApp</a>
+    <hr class="divider">
+    <p style="font-size:13px;color:#888">También puedes ver y gestionar todas las citas del día en tu <a href="${BASE_URL}/agenda" style="color:#c9a227">agenda</a>.</p>
+  `);
+
+  await transporter.sendMail({
+    from: `"🌿 Yerbateras" <${process.env.EMAIL_USER}>`,
+    to: emailNegocio,
+    subject: `🔔 Nueva cita: ${cita.nombre_cliente} — ${fecha}`,
+    html
+  });
+};
+
+// ─── Email: solicitud de cotización (al NEGOCIO) ──────────
+const enviarSolicitudCotizacion = async (emailNegocio, cotizacion) => {
+  if (!emailNegocio) return;
+  const html = htmlBase(`
+    <span class="badge">🏢 Nueva solicitud de cotización</span>
+    <h2>${cotizacion.organizacion} quiere una cotización</h2>
+    <div style="background:#f0f7f0;border-radius:8px;padding:16px 20px;margin:20px 0">
+      <p style="margin:4px 0"><strong>🏢 Organización:</strong> ${cotizacion.organizacion}</p>
+      <p style="margin:4px 0"><strong>👤 Contacto:</strong> ${cotizacion.nombre_contacto}</p>
+      <p style="margin:4px 0"><strong>✉️ Email:</strong> ${cotizacion.email}</p>
+      <p style="margin:4px 0"><strong>📞 Teléfono:</strong> ${cotizacion.telefono}</p>
+      ${cotizacion.interes ? `<p style="margin:4px 0"><strong>📦 Interés:</strong> ${cotizacion.interes}</p>` : ''}
+      ${cotizacion.cantidad_estimada ? `<p style="margin:4px 0"><strong>🔢 Cantidad estimada:</strong> ${cotizacion.cantidad_estimada}</p>` : ''}
+      ${cotizacion.mensaje ? `<p style="margin:4px 0"><strong>📝 Mensaje:</strong> ${cotizacion.mensaje}</p>` : ''}
+    </div>
+    <a href="mailto:${cotizacion.email}" class="btn">✉️ Responder por correo</a>
+  `);
+
+  await transporter.sendMail({
+    from: `"🌿 Yerbateras" <${process.env.EMAIL_USER}>`,
+    to: emailNegocio,
+    subject: `🏢 Cotización: ${cotizacion.organizacion}`,
+    html
+  });
+};
+
+// ─── Email: pago de cita recibido (al CLIENTE) ────────────
+const enviarPagoCitaConfirmado = async (email, nombre, cita) => {
+  const fecha = new Date(`${cita.fecha}T00:00:00`).toLocaleDateString('es-CO', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+  });
+  const html = htmlBase(`
+    <span class="badge">✅ Pago confirmado</span>
+    <h2>¡Listo, ${nombre}! Tu cita está pagada y confirmada</h2>
+    <div style="background:#f0f7f0;border-radius:8px;padding:16px 20px;margin:20px 0">
+      <p style="margin:4px 0"><strong>💆 Servicio:</strong> ${cita.servicio_nombre}</p>
+      <p style="margin:4px 0"><strong>📅 Fecha:</strong> ${fecha}</p>
+      <p style="margin:4px 0"><strong>🕐 Hora:</strong> ${cita.hora_inicio.slice(0,5)} - ${cita.hora_fin.slice(0,5)}</p>
+      <p style="margin:4px 0"><strong>💳 Monto pagado:</strong> $${Number(cita.monto_pagado).toLocaleString('es-CO')} COP</p>
+    </div>
+    <p>Te esperamos. Si necesitas cambiar tu horario, puedes reprogramarla desde tu cuenta o escribiéndonos.</p>
+    <hr class="divider">
+    <p style="font-size:13px;color:#888">Gracias por confiar en Yerbateras.</p>
+  `);
+
+  await transporter.sendMail({
+    from: `"🌿 Yerbateras" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: '✅ Pago recibido — tu cita está confirmada — Yerbateras',
+    html
+  });
+};
+
+module.exports = {
+  enviarEmailVerificacion, enviarConfirmacionPedido, enviarOtpEmail, enviarVerificacionCita,
+  enviarCitaConfirmadaCliente, enviarAlertaCitaNegocio, enviarSolicitudCotizacion, enviarPagoCitaConfirmado,
+};

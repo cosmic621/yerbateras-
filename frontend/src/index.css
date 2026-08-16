@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400;8..60,600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400;8..60,600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -11,7 +11,7 @@ html { scroll-behavior: smooth; }
 body {
   font-family: 'Source Serif 4', Georgia, serif;
   background: #F5F0E1;
-  color: #1E2E1A;
+  color: #052a1c;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -20,4 +20,85 @@ h1, h2, h3, h4, h5, h6 {
 
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: #F5F0E1; }
-::-webkit-scrollbar-thumb { background: #5C6B3A; border-radius: 2px; }
+::-webkit-scrollbar-thumb { background: #146b42; border-radius: 2px; }
+
+@layer components {
+  /* ── Tarjetas de producto ── */
+  .card {
+    @apply bg-white border border-crema-300 shadow-card transition-all duration-300;
+  }
+  .card:hover {
+    @apply shadow-card-hover -translate-y-0.5 border-dorado-300;
+  }
+
+  /* ── Badges ── */
+  .badge-invima {
+    @apply inline-flex items-center gap-1 bg-verde-50 text-verde-700 text-[10px] font-body font-bold uppercase tracking-wide px-2 py-1 border border-verde-200;
+  }
+  .badge-sale {
+    @apply inline-flex items-center gap-1 bg-red-600 text-white text-[11px] font-body font-bold px-2 py-1;
+  }
+  .badge-bestseller {
+    @apply inline-flex items-center gap-1 bg-dorado-500 text-verde-900 text-[10px] font-body font-bold uppercase tracking-wide px-2 py-1;
+  }
+  .badge-new {
+    @apply inline-flex items-center gap-1 bg-verde-900 text-crema-100 text-[10px] font-body font-bold uppercase tracking-wide px-2 py-1;
+  }
+
+  /* ── Inputs ── */
+  .input-field {
+    @apply w-full px-4 py-3 border border-crema-300 bg-white font-body text-sm text-verde-900 outline-none transition-colors duration-200;
+  }
+  .input-field:focus {
+    @apply border-dorado-500 ring-1 ring-dorado-500;
+  }
+
+  /* ── Botones ── */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 bg-verde-900 text-crema-100 font-body font-semibold text-sm tracking-wide px-6 py-3 transition-colors duration-200;
+  }
+  .btn-primary:hover:not(:disabled) { @apply bg-verde-800; }
+  .btn-gold {
+    @apply inline-flex items-center justify-center gap-2 bg-dorado-500 text-verde-900 font-body font-bold text-sm tracking-wide px-6 py-3 transition-colors duration-200;
+  }
+  .btn-gold:hover:not(:disabled) { @apply bg-dorado-400; }
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 border border-crema-300 text-verde-800 font-body font-semibold text-sm tracking-wide px-6 py-3 transition-colors duration-200 bg-white;
+  }
+  .btn-outline:hover:not(:disabled) { @apply border-dorado-500 text-dorado-600; }
+
+  /* ── Etiqueta estilo "botica" (referencia del logo) ──
+     Aproximacion tipografica: mayusculas + tracking ancho + Cormorant
+     Garamond. No es la fuente exacta de la referencia — si tienes el
+     nombre/archivo real, lo cambiamos por el original. */
+  .label-botica {
+    @apply font-label uppercase tracking-[0.15em] text-verde-700 font-semibold;
+  }
+
+  /* ── Efecto de gota de agua al pasar el mouse (imágenes de producto/taller) ── */
+  .hover-gota {
+    position: relative;
+    overflow: hidden;
+  }
+  .hover-gota::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 70%);
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .hover-gota:hover::after {
+    animation: gotaCaida 0.9s ease-out;
+  }
+}
+
+@keyframes gotaCaida {
+  0%   { width: 0;    height: 0;    opacity: 0.65; }
+  100% { width: 220%; height: 220%; opacity: 0; }
+}

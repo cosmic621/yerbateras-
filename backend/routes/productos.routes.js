@@ -3,6 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const c = require('../controllers/productos.controller');
+const resenasC = require('../controllers/resenas.controller');
 const { verificarToken, soloAdmin } = require('../middlewares/auth.middleware');
 
 const storage = multer.diskStorage({
@@ -21,7 +22,10 @@ const upload = multer({
 // Públicas
 router.get('/', c.listarProductos);
 router.get('/categorias', c.listarCategorias);
+router.get('/lineas-cuidado', c.listarLineasCuidado);
 router.get('/:id', c.obtenerProducto);
+router.get('/:id/puede-resenar', verificarToken, resenasC.puedeResenar);
+router.post('/:id/resenas', verificarToken, resenasC.crearResena);
 
 // Admin
 router.post('/', verificarToken, soloAdmin, upload.single('imagen'), c.crearProducto);

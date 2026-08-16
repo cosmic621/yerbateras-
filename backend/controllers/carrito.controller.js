@@ -15,9 +15,35 @@ const obtenerCarrito = async (req, res) => {
       [carrito.id]
     );
     const total = rows.reduce((s, i) => s + parseFloat(i.subtotal), 0);
-    res.json({ ok: true, carrito_id: carrito.id, items: rows, total });
+
+    // "Tambien te puede interesar": productos destacados que NO estan ya en el carrito
+    const idsEnCarrito = rows.map(r => r.producto_id);
+    const sugerenciasQ = await pool.query(
+      `SELECT id, nombre, imagen_principal, precio, precio_descuento
+       FROM productos
+       WHERE activo = TRUE AND stock > 0 ${idsEnCarrito.length ? 'AND id != ALL($1)' : ''}
+       ORDER BY destacado DESC, ventas_totales DESC
+       LIMIT 5`,
+      idsEnCarrito.length ? [idsEnCarrito] : []
+    );
+
+    res.json({ ok: true, carrito_id: carrito.id, notas: carrito.notas, items: rows, total, sugerencias: sugerenciasQ.rows });
   } catch (err) {
+    console.error('Error obtenerCarrito:', err);
     res.status(500).json({ ok: false, mensaje: 'Error al obtener carrito' });
+  }
+};
+
+// ─── GUARDAR nota de regalo del carrito ────────────────────
+const actualizarNotas = async (req, res) => {
+  const { notas } = req.body;
+  try {
+    const carrito = await obtenerOCrearCarrito(req.usuario.id);
+    await pool.query('UPDATE carritos SET notas = $1 WHERE id = $2', [(notas || '').slice(0, 120), carrito.id]);
+    res.json({ ok: true, mensaje: 'Nota guardada' });
+  } catch (err) {
+    console.error('Error actualizarNotas carrito:', err);
+    res.status(500).json({ ok: false, mensaje: 'Error al guardar la nota' });
   }
 };
 
@@ -105,13 +131,13 @@ const limpiarCarrito = async (req, res) => {
 // ─── Helper: obtener o crear carrito activo ────────────────
 const obtenerOCrearCarrito = async (usuario_id) => {
   const { rows } = await pool.query(
-    'SELECT id FROM carritos WHERE usuario_id = $1 AND activo = TRUE', [usuario_id]
+    'SELECT id, notas FROM carritos WHERE usuario_id = $1 AND activo = TRUE', [usuario_id]
   );
   if (rows[0]) return rows[0];
   const ins = await pool.query(
-    'INSERT INTO carritos (usuario_id) VALUES ($1) RETURNING id', [usuario_id]
+    'INSERT INTO carritos (usuario_id) VALUES ($1) RETURNING id, notas', [usuario_id]
   );
   return ins.rows[0];
 };
 
-module.exports = { obtenerCarrito, agregarItem, actualizarItem, eliminarItem, limpiarCarrito };
+module.exports = { obtenerCarrito, agregarItem, actualizarItem, eliminarItem, limpiarCarrito, actualizarNotas };

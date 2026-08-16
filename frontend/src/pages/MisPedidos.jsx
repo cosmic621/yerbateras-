@@ -21,13 +21,13 @@ export default function MisPedidos() {
   }, []);
 
   if (cargando) return (
-    <div className="min-h-screen flex items-center justify-center pt-16">
+    <div className="min-h-screen flex items-center justify-center">
       <div className="w-8 h-8 border-4 border-verde-200 border-t-verde-600 rounded-full animate-spin" />
     </div>
   );
 
   return (
-    <div className="pt-16 min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50">
       <div className="max-w-3xl mx-auto px-6 py-10">
         <h1 className="font-display text-3xl font-bold text-verde-800 mb-8 flex items-center gap-3">
           <Package size={28} className="text-dorado-500" /> Mis Pedidos

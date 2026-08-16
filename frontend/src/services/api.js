@@ -17,7 +17,7 @@ api.interceptors.response.use(
       localStorage.removeItem('yb_token');
       delete api.defaults.headers.common['Authorization'];
       // Redirigir solo si no está en una ruta pública
-      if (!['/', '/tienda', '/producto'].some(p => window.location.pathname.startsWith(p))) {
+      if (!['/', '/tienda', '/producto', '/citas'].some(p => window.location.pathname.startsWith(p))) {
         window.location.href = '/login';
       }
     }

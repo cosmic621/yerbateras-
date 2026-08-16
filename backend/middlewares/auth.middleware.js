@@ -88,4 +88,27 @@ const validarInputs = (campos) => (req, res, next) => {
   next();
 };
 
-module.exports = { verificarToken, soloAdmin, requiereVerificado, validarInputs };
+// ─── Autenticación opcional (no bloquea si no hay token) ───
+// Si viene un token valido, llena req.usuario; si no viene o es invalido,
+// simplemente sigue sin usuario (util para el formulario publico de citas,
+// que funciona con o sin cuenta).
+const intentarAutenticar = async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) return next();
+
+    const token = authHeader.split(' ')[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const { rows } = await pool.query(
+      `SELECT u.id, u.nombre, u.email, u.telefono, u.verificado, u.activo, r.nombre AS rol
+       FROM usuarios u JOIN roles r ON u.rol_id = r.id WHERE u.id = $1`,
+      [decoded.id]
+    );
+    if (rows[0]?.activo) req.usuario = rows[0];
+    next();
+  } catch {
+    next(); // token invalido/expirado: seguimos como invitado, no es un error
+  }
+};
+
+module.exports = { verificarToken, soloAdmin, requiereVerificado, validarInputs, intentarAutenticar };

@@ -13,12 +13,13 @@ const pagosRoutes    = require('./routes/pagos.routes');
 const adminRoutes    = require('./routes/admin.routes');
 const tiendaRoutes   = require('./routes/tienda.routes');
 const reportesRoutes = require('./routes/reportes.routes');
+const citasRoutes    = require('./routes/citas.routes');
+const newsletterRoutes = require('./routes/newsletter.routes');
+const cotizacionesRoutes = require('./routes/cotizaciones.routes');
+const botiquinRoutes = require('./routes/botiquin.routes');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
-
-// Stripe webhook necesita body raw
-app.use('/api/pagos/webhook', express.raw({ type: 'application/json' }));
 
 app.use(cors({
   origin: process.env.CLIENT_URL || 'http://localhost:5173',
@@ -38,6 +39,10 @@ app.use('/api/pagos',     pagosRoutes);
 app.use('/api/admin',     adminRoutes);
 app.use('/api/tienda',    tiendaRoutes);
 app.use('/api/admin/reportes', reportesRoutes);
+app.use('/api/citas',     citasRoutes);
+app.use('/api/newsletter', newsletterRoutes);
+app.use('/api/cotizaciones', cotizacionesRoutes);
+app.use('/api/botiquin', botiquinRoutes);
 
 app.get('/health', (req, res) =>
   res.json({ status:'ok', service:'Yerbateras API', ts: new Date() })

@@ -195,7 +195,159 @@ const actualizarConfiguracion = async (req, res) => {
   }
 };
 
+// ─── CATEGORÍAS (admin) ────────────────────────────────────
+const generarSlug = (texto) => texto
+  .toLowerCase()
+  .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  .replace(/[^a-z0-9]+/g, '-')
+  .replace(/(^-|-$)/g, '');
+
+const getCategorias = async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT c.id, c.nombre, c.descripcion, c.slug, c.imagen_url, c.activa,
+              COUNT(p.id) FILTER (WHERE p.activo = TRUE) AS total_productos
+       FROM categorias c LEFT JOIN productos p ON p.categoria_id = c.id
+       GROUP BY c.id ORDER BY c.nombre`
+    );
+    res.json({ ok: true, categorias: rows });
+  } catch (err) {
+    console.error('Error getCategorias:', err);
+    res.status(500).json({ ok: false, mensaje: 'Error al obtener categorías' });
+  }
+};
+
+const crearCategoria = async (req, res) => {
+  const { nombre, descripcion, imagen_url } = req.body;
+  if (!nombre?.trim()) return res.status(400).json({ ok: false, mensaje: 'El nombre es requerido' });
+  try {
+    const slug = generarSlug(nombre);
+    const { rows } = await pool.query(
+      `INSERT INTO categorias (nombre, descripcion, slug, imagen_url) VALUES ($1,$2,$3,$4) RETURNING id`,
+      [nombre.trim(), descripcion || null, slug, imagen_url || null]
+    );
+    res.status(201).json({ ok: true, mensaje: 'Categoría creada', id: rows[0].id });
+  } catch (err) {
+    if (err.code === '23505') return res.status(409).json({ ok: false, mensaje: 'Ya existe una categoría con ese nombre' });
+    console.error('Error crearCategoria:', err);
+    res.status(500).json({ ok: false, mensaje: 'Error al crear la categoría' });
+  }
+};
+
+const actualizarCategoria = async (req, res) => {
+  const { id } = req.params;
+  const { nombre, descripcion, imagen_url, activa } = req.body;
+  try {
+    const slug = nombre ? generarSlug(nombre) : undefined;
+    await pool.query(
+      `UPDATE categorias SET
+        nombre = COALESCE($1, nombre),
+        slug = COALESCE($2, slug),
+        descripcion = COALESCE($3, descripcion),
+        imagen_url = COALESCE($4, imagen_url),
+        activa = COALESCE($5, activa)
+       WHERE id = $6`,
+      [nombre || null, slug || null, descripcion, imagen_url, activa, id]
+    );
+    res.json({ ok: true, mensaje: 'Categoría actualizada' });
+  } catch (err) {
+    if (err.code === '23505') return res.status(409).json({ ok: false, mensaje: 'Ya existe una categoría con ese nombre' });
+    console.error('Error actualizarCategoria:', err);
+    res.status(500).json({ ok: false, mensaje: 'Error al actualizar la categoría' });
+  }
+};
+
+// Borrado seguro: si tiene productos asociados, solo se desactiva (para no
+// romper productos existentes); si no tiene ninguno, se borra de verdad.
+const eliminarCategoria = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const { rows } = await pool.query('SELECT COUNT(*) FROM productos WHERE categoria_id = $1', [id]);
+    if (Number(rows[0].count) > 0) {
+      await pool.query('UPDATE categorias SET activa = FALSE WHERE id = $1', [id]);
+      return res.json({ ok: true, mensaje: 'La categoría tiene productos asociados, se desactivó en vez de borrarse.' });
+    }
+    await pool.query('DELETE FROM categorias WHERE id = $1', [id]);
+    res.json({ ok: true, mensaje: 'Categoría eliminada' });
+  } catch (err) {
+    console.error('Error eliminarCategoria:', err);
+    res.status(500).json({ ok: false, mensaje: 'Error al eliminar la categoría' });
+  }
+};
+
+// ─── LÍNEAS DE CUIDADO (admin) ──────────────────────────────
+const getLineasCuidado = async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT lc.id, lc.nombre, lc.descripcion, lc.slug, lc.orden, lc.activa,
+              COUNT(DISTINCT plc.producto_id) AS total_productos
+       FROM lineas_cuidado lc
+       LEFT JOIN producto_lineas_cuidado plc ON plc.linea_id = lc.id
+       GROUP BY lc.id ORDER BY lc.orden, lc.nombre`
+    );
+    res.json({ ok: true, lineas: rows });
+  } catch (err) {
+    console.error('Error getLineasCuidado:', err);
+    res.status(500).json({ ok: false, mensaje: 'Error al obtener líneas de cuidado' });
+  }
+};
+
+const crearLineaCuidado = async (req, res) => {
+  const { nombre, descripcion, orden } = req.body;
+  if (!nombre?.trim()) return res.status(400).json({ ok: false, mensaje: 'El nombre es requerido' });
+  try {
+    const slug = generarSlug(nombre);
+    const { rows } = await pool.query(
+      `INSERT INTO lineas_cuidado (nombre, descripcion, slug, orden) VALUES ($1,$2,$3,$4) RETURNING id`,
+      [nombre.trim(), descripcion || null, slug, orden || 0]
+    );
+    res.status(201).json({ ok: true, mensaje: 'Línea de cuidado creada', id: rows[0].id });
+  } catch (err) {
+    if (err.code === '23505') return res.status(409).json({ ok: false, mensaje: 'Ya existe una línea con ese nombre' });
+    console.error('Error crearLineaCuidado:', err);
+    res.status(500).json({ ok: false, mensaje: 'Error al crear la línea de cuidado' });
+  }
+};
+
+const actualizarLineaCuidado = async (req, res) => {
+  const { id } = req.params;
+  const { nombre, descripcion, orden, activa } = req.body;
+  try {
+    const slug = nombre ? generarSlug(nombre) : undefined;
+    await pool.query(
+      `UPDATE lineas_cuidado SET
+        nombre = COALESCE($1, nombre), slug = COALESCE($2, slug),
+        descripcion = COALESCE($3, descripcion), orden = COALESCE($4, orden), activa = COALESCE($5, activa)
+       WHERE id = $6`,
+      [nombre || null, slug || null, descripcion, orden, activa, id]
+    );
+    res.json({ ok: true, mensaje: 'Línea de cuidado actualizada' });
+  } catch (err) {
+    if (err.code === '23505') return res.status(409).json({ ok: false, mensaje: 'Ya existe una línea con ese nombre' });
+    console.error('Error actualizarLineaCuidado:', err);
+    res.status(500).json({ ok: false, mensaje: 'Error al actualizar la línea de cuidado' });
+  }
+};
+
+const eliminarLineaCuidado = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const { rows } = await pool.query('SELECT COUNT(*) FROM producto_lineas_cuidado WHERE linea_id = $1', [id]);
+    if (Number(rows[0].count) > 0) {
+      await pool.query('UPDATE lineas_cuidado SET activa = FALSE WHERE id = $1', [id]);
+      return res.json({ ok: true, mensaje: 'La línea tiene productos asociados, se desactivó en vez de borrarse.' });
+    }
+    await pool.query('DELETE FROM lineas_cuidado WHERE id = $1', [id]);
+    res.json({ ok: true, mensaje: 'Línea de cuidado eliminada' });
+  } catch (err) {
+    console.error('Error eliminarLineaCuidado:', err);
+    res.status(500).json({ ok: false, mensaje: 'Error al eliminar la línea de cuidado' });
+  }
+};
+
 module.exports = {
   getDashboard, getInventario, getPedidos, cambiarEstadoPedido,
-  getUsuarios, toggleUsuario, ajustarStock, getConfiguracion, actualizarConfiguracion
+  getUsuarios, toggleUsuario, ajustarStock, getConfiguracion, actualizarConfiguracion,
+  getCategorias, crearCategoria, actualizarCategoria, eliminarCategoria,
+  getLineasCuidado, crearLineaCuidado, actualizarLineaCuidado, eliminarLineaCuidado,
 };

@@ -1,14 +1,15 @@
-const getStripe = () => require('stripe')(process.env.STRIPE_SECRET_KEY);
 const pool = require('../config/db');
 const { enviarConfirmacionPedido } = require('../config/email');
+const { generarReferencia, firmarIntegridad, verificarFirmaEvento } = require('../config/wompi');
+const { validarCuponInterno } = require('./cupones.controller');
+const { confirmarPagoCita, cancelarPagoCita } = require('./citas.controller');
 
-// ─── CREAR Payment Intent ──────────────────────────────────
-const crearPaymentIntent = async (req, res) => {
-  const { direccion_id, notas_cliente } = req.body;
+// ─── CREAR pedido + datos para abrir el widget de Wompi ────
+const crearPedido = async (req, res) => {
+  const { direccion_id, notas_cliente, codigo_cupon } = req.body;
   const usuario_id = req.usuario.id;
 
   try {
-    // Obtener carrito
     const carrito = await pool.query(
       `SELECT c.id FROM carritos c WHERE c.usuario_id = $1 AND c.activo = TRUE`,
       [usuario_id]
@@ -21,10 +22,8 @@ const crearPaymentIntent = async (req, res) => {
        WHERE ci.carrito_id = $1`,
       [carrito.rows[0].id]
     );
-
     if (!items.rows.length) return res.status(400).json({ ok: false, mensaje: 'Carrito vacío' });
 
-    // Validar stock
     for (const item of items.rows) {
       if (item.stock < item.cantidad) {
         return res.status(400).json({ ok: false, mensaje: `Sin stock suficiente para: ${item.nombre}` });
@@ -33,25 +32,31 @@ const crearPaymentIntent = async (req, res) => {
 
     const subtotal = items.rows.reduce((s, i) => s + (i.cantidad * parseFloat(i.precio_unitario)), 0);
     const costo_envio = subtotal >= 150000 ? 0 : 10000;
-    const total = subtotal + costo_envio;
 
-    // Crear PaymentIntent en Stripe (en centavos)
-    const paymentIntent = await getStripe().paymentIntents.create({
-      amount: Math.round(total * 100),
-      currency: 'cop',
-      metadata: { usuario_id, carrito_id: carrito.rows[0].id }
-    });
+    // Cupón opcional
+    let descuento = 0;
+    let cupon_id = null;
+    if (codigo_cupon) {
+      const resultado = await validarCuponInterno(codigo_cupon, subtotal);
+      if (!resultado.valido) return res.status(400).json({ ok: false, mensaje: resultado.mensaje });
+      descuento = resultado.descuento;
+      cupon_id = resultado.cupon.id;
+    }
 
-    // Crear pedido en BD (estado: pendiente)
+    const total = Math.max(subtotal + costo_envio - descuento, 0);
+    const amountInCents = Math.round(total * 100);
+    const currency = 'COP';
+    const reference = generarReferencia();
+    const signature = firmarIntegridad(reference, amountInCents, currency);
+
     const pedido = await pool.query(
-      `INSERT INTO pedidos (usuario_id, direccion_id, subtotal, costo_envio, total,
-                            stripe_payment_intent_id, notas_cliente, numero_pedido)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,'')
+      `INSERT INTO pedidos (usuario_id, direccion_id, subtotal, descuento, costo_envio, total,
+                            metodo_pago, wompi_reference, notas_cliente, numero_pedido, cupon_id)
+       VALUES ($1,$2,$3,$4,$5,$6,'wompi',$7,$8,'',$9)
        RETURNING id, numero_pedido`,
-      [usuario_id, direccion_id || null, subtotal, costo_envio, total, paymentIntent.id, notas_cliente || null]
+      [usuario_id, direccion_id || null, subtotal, descuento, costo_envio, total, reference, notas_cliente || null, cupon_id]
     );
 
-    // Insertar items del pedido
     for (const item of items.rows) {
       await pool.query(
         `INSERT INTO pedido_items (pedido_id, producto_id, nombre_producto, imagen_producto, cantidad, precio_unitario, subtotal)
@@ -63,45 +68,60 @@ const crearPaymentIntent = async (req, res) => {
 
     res.json({
       ok: true,
-      client_secret: paymentIntent.client_secret,
       pedido_id: pedido.rows[0].id,
       numero_pedido: pedido.rows[0].numero_pedido,
-      total
+      reference,
+      amountInCents,
+      currency,
+      publicKey: process.env.WOMPI_PUBLIC_KEY,
+      signature,
+      subtotal,
+      descuento,
+      costo_envio,
+      total,
     });
   } catch (err) {
-    console.error('Error PaymentIntent:', err);
+    console.error('Error creando pedido (Wompi):', err);
     res.status(500).json({ ok: false, mensaje: 'Error al procesar pago' });
   }
 };
 
-// ─── WEBHOOK de Stripe (confirmar pago) ───────────────────
+// ─── WEBHOOK de Wompi (fuente de verdad del estado del pago) ─
 const webhook = async (req, res) => {
-  const sig = req.headers['stripe-signature'];
-  let event;
   try {
-    event = getStripe().webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
-  } catch (err) {
-    return res.status(400).json({ error: `Webhook Error: ${err.message}` });
-  }
+    const event = req.body;
 
-  if (event.type === 'payment_intent.succeeded') {
-    const intent = event.data.object;
-    try {
-      // Actualizar pedido
+    if (!verificarFirmaEvento(event)) {
+      console.error('Firma de webhook Wompi inválida — evento ignorado');
+      return res.status(400).json({ ok: false, mensaje: 'Firma inválida' });
+    }
+
+    const tx = event.data?.transaction;
+    if (!tx) return res.json({ ok: true });
+
+    // Un solo webhook de Wompi recibe eventos tanto de pedidos de tienda
+    // como de pagos de citas — se distinguen por el prefijo de la referencia.
+    if (tx.reference?.startsWith('CITA-')) {
+      if (tx.status === 'APPROVED') {
+        await confirmarPagoCita(tx.reference, tx);
+      } else if (['DECLINED', 'VOIDED', 'ERROR'].includes(tx.status)) {
+        await cancelarPagoCita(tx.reference);
+      }
+      return res.json({ ok: true });
+    }
+
+    if (tx.status === 'APPROVED') {
       const { rows } = await pool.query(
-        `UPDATE pedidos SET estado = 'pagado', stripe_charge_id = $1, actualizado_en = NOW()
-         WHERE stripe_payment_intent_id = $2
-         RETURNING id, numero_pedido, usuario_id, total`,
-        [intent.latest_charge, intent.id]
+        `UPDATE pedidos SET estado = 'pagado', wompi_transaction_id = $1, actualizado_en = NOW()
+         WHERE wompi_reference = $2 AND estado != 'pagado'
+         RETURNING id, numero_pedido, usuario_id, total, cupon_id`,
+        [tx.id, tx.reference]
       );
 
       if (rows[0]) {
         const pedido = rows[0];
+        const items = await pool.query('SELECT * FROM pedido_items WHERE pedido_id = $1', [pedido.id]);
 
-        // Descontar stock y limpiar carrito
-        const items = await pool.query(
-          'SELECT * FROM pedido_items WHERE pedido_id = $1', [pedido.id]
-        );
         for (const item of items.rows) {
           await pool.query(
             'UPDATE productos SET stock = stock - $1, ventas_totales = ventas_totales + $1 WHERE id = $2',
@@ -109,7 +129,10 @@ const webhook = async (req, res) => {
           );
         }
 
-        // Limpiar carrito
+        if (pedido.cupon_id) {
+          await pool.query('UPDATE cupones SET usos_actuales = usos_actuales + 1 WHERE id = $1', [pedido.cupon_id]);
+        }
+
         const carritoQ = await pool.query(
           'SELECT id FROM carritos WHERE usuario_id = $1 AND activo = TRUE', [pedido.usuario_id]
         );
@@ -117,48 +140,43 @@ const webhook = async (req, res) => {
           await pool.query('DELETE FROM carrito_items WHERE carrito_id = $1', [carritoQ.rows[0].id]);
         }
 
-        // Email de confirmación
         const usuario = await pool.query('SELECT nombre, email FROM usuarios WHERE id = $1', [pedido.usuario_id]);
         if (usuario.rows[0]?.email) {
-          const itemsEmail = await pool.query('SELECT * FROM pedido_items WHERE pedido_id = $1', [pedido.id]);
           enviarConfirmacionPedido(usuario.rows[0].email, usuario.rows[0].nombre, {
             numero_pedido: pedido.numero_pedido,
             total: pedido.total,
-            items: itemsEmail.rows
+            items: items.rows,
           }).catch(console.error);
         }
       }
-    } catch (err) {
-      console.error('Error procesando webhook:', err);
+    } else if (['DECLINED', 'VOIDED', 'ERROR'].includes(tx.status)) {
+      await pool.query(
+        `UPDATE pedidos SET estado = 'cancelado', actualizado_en = NOW() WHERE wompi_reference = $1 AND estado != 'pagado'`,
+        [tx.reference]
+      ).catch(console.error);
     }
-  }
 
-  if (event.type === 'payment_intent.payment_failed') {
-    const intent = event.data.object;
-    await pool.query(
-      `UPDATE pedidos SET estado = 'cancelado' WHERE stripe_payment_intent_id = $1`,
-      [intent.id]
-    ).catch(console.error);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Error procesando webhook Wompi:', err);
+    res.status(500).json({ ok: false });
   }
-
-  res.json({ received: true });
 };
 
-// ─── CONFIRMAR pago manualmente (fallback) ─────────────────
-const confirmarPago = async (req, res) => {
-  const { payment_intent_id } = req.body;
+// ─── Consultar el estado actual de un pedido por su referencia ─
+const consultarEstado = async (req, res) => {
+  const { reference } = req.params;
   try {
-    const intent = await getStripe().paymentIntents.retrieve(payment_intent_id);
-    if (intent.status !== 'succeeded') {
-      return res.status(400).json({ ok: false, mensaje: 'Pago no completado' });
-    }
     const { rows } = await pool.query(
-      `SELECT * FROM pedidos WHERE stripe_payment_intent_id = $1`, [payment_intent_id]
+      `SELECT numero_pedido, estado, total FROM pedidos WHERE wompi_reference = $1 AND usuario_id = $2`,
+      [reference, req.usuario.id]
     );
+    if (!rows[0]) return res.status(404).json({ ok: false, mensaje: 'Pedido no encontrado' });
     res.json({ ok: true, pedido: rows[0] });
   } catch (err) {
-    res.status(500).json({ ok: false, mensaje: 'Error al confirmar pago' });
+    console.error('Error consultando estado del pedido:', err);
+    res.status(500).json({ ok: false, mensaje: 'Error al consultar el pedido' });
   }
 };
 
-module.exports = { crearPaymentIntent, webhook, confirmarPago };
+module.exports = { crearPedido, webhook, consultarEstado };

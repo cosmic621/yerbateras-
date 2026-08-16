@@ -9,7 +9,7 @@ const WHATSAPP  = 'https://wa.me/573102631592';
 
 // ── HERO ──────────────────────────────────────────────────
 const Hero = () => (
-  <section className="relative min-h-screen flex items-center overflow-hidden" style={{background:'linear-gradient(135deg, #1E2E1A 0%, #2d4a22 50%, #1E2E1A 100%)'}}>
+  <section className="relative min-h-screen flex items-center overflow-hidden" style={{background:'linear-gradient(135deg, #052a1c 0%, #0a3d28 50%, #052a1c 100%)'}}>
     {/* Fondo texturizado */}
     <div className="absolute inset-0" style={{backgroundImage:"url(\"data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5z' fill='%23ffffff' fill-opacity='0.02' fill-rule='evenodd'/%3E%3C/svg%3E\")"}} />
     
@@ -27,21 +27,21 @@ const Hero = () => (
 
           <h1 className="font-display font-bold leading-none mb-6" style={{fontSize:'clamp(2.5rem,5vw,4.5rem)', color:'#F5F0E1'}}>
             El poder<br />
-            <span style={{color:'#C8874A', fontStyle:'italic'}}>curativo</span><br />
+            <span style={{color:'#e0a83e', fontStyle:'italic'}}>curativo</span><br />
             de las plantas
           </h1>
 
-          <p className="font-body leading-relaxed mb-3" style={{color:'#c8bfa8', fontSize:'1.1rem', maxWidth:'480px'}}>
+          <p className="font-body leading-relaxed mb-3" style={{color:'#a8dec0', fontSize:'1.1rem', maxWidth:'480px'}}>
             Productos herbales elaborados artesanalmente con plantas medicinales seleccionadas por sus propiedades terapeuticas y aromaticas.
           </p>
-          <p className="font-body leading-relaxed mb-10" style={{color:'#8fa882', fontSize:'0.95rem', maxWidth:'460px'}}>
+          <p className="font-body leading-relaxed mb-10" style={{color:'#6ec194', fontSize:'0.95rem', maxWidth:'460px'}}>
             Aceites, pomadas, banos herbales, tinturas, perfumes botanicos e infusiones para el bienestar fisico, emocional y espiritual.
           </p>
 
           <div className="flex flex-wrap gap-4 mb-14">
             <Link to="/tienda"
               className="inline-flex items-center gap-2 font-body font-semibold tracking-wide px-8 py-4 transition-all duration-200"
-              style={{background:'#C8874A', color:'#1E2E1A', fontSize:'0.9rem'}}>
+              style={{background:'#e0a83e', color:'#052a1c', fontSize:'0.9rem'}}>
               Explorar productos <ArrowRight size={16} />
             </Link>
             <a href="#nosotros"
@@ -59,8 +59,8 @@ const Hero = () => (
               { num: 'INVIMA', label: 'Certificado' },
             ].map(s => (
               <div key={s.label}>
-                <div className="font-display font-bold" style={{fontSize:'1.8rem', color:'#C8874A'}}>{s.num}</div>
-                <div className="font-body mt-1" style={{color:'#8fa882', fontSize:'0.78rem', textTransform:'uppercase', letterSpacing:'0.05em'}}>{s.label}</div>
+                <div className="font-display font-bold" style={{fontSize:'1.8rem', color:'#e0a83e'}}>{s.num}</div>
+                <div className="font-body mt-1" style={{color:'#6ec194', fontSize:'0.78rem', textTransform:'uppercase', letterSpacing:'0.05em'}}>{s.label}</div>
               </div>
             ))}
           </div>
@@ -73,12 +73,12 @@ const Hero = () => (
             <div className="absolute inset-0 rounded-none border" style={{background:'rgba(92,107,58,0.15)', borderColor:'rgba(200,135,74,0.25)'}}>
               <div className="absolute inset-0 flex flex-col items-center justify-center p-8">
                 <div className="w-20 h-20 rounded-full flex items-center justify-center mb-6" style={{background:'rgba(200,135,74,0.15)', border:'1px solid rgba(200,135,74,0.3)'}}>
-                  <Leaf size={36} style={{color:'#C8874A'}} />
+                  <Leaf size={36} style={{color:'#e0a83e'}} />
                 </div>
                 <p className="font-display text-center font-bold text-xl mb-2" style={{color:'#F5F0E1'}}>Yerbateras</p>
-                <p className="font-body text-center text-xs tracking-widest uppercase" style={{color:'#8fa882'}}>Herbolaria artesanal</p>
-                <div className="w-8 h-px my-5" style={{background:'#C8874A'}} />
-                <p className="font-body text-center text-sm leading-relaxed" style={{color:'#c8bfa8'}}>
+                <p className="font-body text-center text-xs tracking-widest uppercase" style={{color:'#6ec194'}}>Herbolaria artesanal</p>
+                <div className="w-8 h-px my-5" style={{background:'#e0a83e'}} />
+                <p className="font-body text-center text-sm leading-relaxed" style={{color:'#a8dec0'}}>
                   Mas de 10 anos recuperando saberes ancestrales y el poder de las plantas para el cuidado cotidiano.
                 </p>
               </div>
@@ -105,8 +105,8 @@ const Confianza = () => (
           { icon: BookOpen, text: 'Talleres educativos' },
         ].map(({ icon: Icon, text }) => (
           <div key={text} className="flex items-center gap-2">
-            <Icon size={15} style={{color:'#5C6B3A'}} />
-            <span className="font-body text-sm font-semibold" style={{color:'#2d4a22', letterSpacing:'0.02em'}}>{text}</span>
+            <Icon size={15} style={{color:'#146b42'}} />
+            <span className="font-body text-sm font-semibold" style={{color:'#0a3d28', letterSpacing:'0.02em'}}>{text}</span>
           </div>
         ))}
       </div>
@@ -114,23 +114,100 @@ const Confianza = () => (
   </div>
 );
 
-// ── NOSOTROS ──────────────────────────────────────────────
+// ── EXPLORA POR NECESIDAD ─────────────────────────────────
+// ── LOS MAS VENDIDOS ──────────────────────────────────────
+// Productos reales ordenados por ventas, al estilo de la referencia.
+const MasVendidos = () => {
+  const [productos, setProductos] = useState([]);
+  const [cargando, setCargando] = useState(true);
+
+  useEffect(() => {
+    api.get('/productos', { params: { orden: 'mas_vendidos', limit: 4 } })
+      .then(res => setProductos(res.data.productos || []))
+      .catch(() => setProductos([]))
+      .finally(() => setCargando(false));
+  }, []);
+
+  if (!cargando && productos.length === 0) return null;
+
+  return (
+    <section style={{background:'white', padding:'5rem 0', borderBottom:'1px solid #ddd6c2'}}>
+      <div className="max-w-7xl mx-auto px-6 lg:px-12">
+        <div className="text-center mb-12">
+          <div className="flex items-center justify-center gap-3 mb-3">
+            <div className="h-px w-10" style={{background:'#e0a83e'}} />
+            <span className="font-body text-xs tracking-widest uppercase font-semibold" style={{color:'#e0a83e'}}>Favoritos del taller</span>
+            <div className="h-px w-10" style={{background:'#e0a83e'}} />
+          </div>
+          <h2 className="font-display font-bold" style={{fontSize:'clamp(1.6rem,2.5vw,2.2rem)', color:'#052a1c'}}>
+            Los más vendidos
+          </h2>
+          <p className="font-body mt-2" style={{color:'#6ec194', fontSize:'0.9rem'}}>
+            Conoce los favoritos e infaltables de nuestra tienda
+          </p>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {(cargando ? Array.from({length:4}) : productos).map((p, i) => (
+            <Link key={p?.id || i} to={p ? `/tienda/${p.id}` : '#'}
+              className="group flex flex-col"
+              style={{pointerEvents: cargando ? 'none' : 'auto'}}>
+              <div className="relative aspect-square overflow-hidden mb-4" style={{background:'#f0ead9'}}>
+                {cargando ? (
+                  <div className="w-full h-full animate-pulse" style={{background:'#ede8da'}} />
+                ) : p.imagen_principal ? (
+                  <img src={p.imagen_principal} alt={p.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center"><Leaf size={40} color="#6ec194" /></div>
+                )}
+              </div>
+              {!cargando && (
+                <>
+                  <h3 className="font-display text-sm font-bold text-center mb-1" style={{color:'#052a1c'}}>{p.nombre}</h3>
+                  <p className="font-body text-sm text-center font-semibold mb-1" style={{color:'#146b42'}}>
+                    ${Number(p.precio_descuento || p.precio).toLocaleString('es-CO')}
+                  </p>
+                  {p.calificacion_promedio > 0 && (
+                    <div className="flex items-center justify-center gap-1">
+                      {[...Array(5)].map((_, s) => (
+                        <Star key={s} size={11} color="#e0a83e" fill={s < Math.round(p.calificacion_promedio) ? '#e0a83e' : 'transparent'} />
+                      ))}
+                      <span className="font-body text-xs" style={{color:'#6ec194'}}>({p.total_resenas})</span>
+                    </div>
+                  )}
+                </>
+              )}
+            </Link>
+          ))}
+        </div>
+
+        <div className="text-center mt-12">
+          <Link to="/tienda" className="inline-flex items-center gap-2 font-body text-sm font-semibold" style={{color:'#146b42'}}>
+            Ver toda la tienda <ArrowRight size={14} />
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+
 const Nosotros = () => (
   <section id="nosotros" className="py-28" style={{background:'#F5F0E1'}}>
     <div className="max-w-7xl mx-auto px-6 lg:px-12">
       <div className="grid lg:grid-cols-2 gap-20 items-start">
         <div>
           <div className="flex items-center gap-3 mb-5">
-            <div className="h-px w-10" style={{background:'#C8874A'}} />
-            <span className="font-body text-xs tracking-widest uppercase font-semibold" style={{color:'#C8874A'}}>Quienes somos</span>
+            <div className="h-px w-10" style={{background:'#e0a83e'}} />
+            <span className="font-body text-xs tracking-widest uppercase font-semibold" style={{color:'#e0a83e'}}>Quienes somos</span>
           </div>
-          <h2 className="font-display font-bold leading-tight mb-6" style={{fontSize:'clamp(1.8rem,3vw,2.8rem)', color:'#1E2E1A'}}>
+          <h2 className="font-display font-bold leading-tight mb-6" style={{fontSize:'clamp(1.8rem,3vw,2.8rem)', color:'#052a1c'}}>
             Mas de 10 anos<br />cultivando bienestar
           </h2>
-          <p className="font-body leading-relaxed mb-5" style={{color:'#3d5a35', fontSize:'1.05rem'}}>
+          <p className="font-body leading-relaxed mb-5" style={{color:'#0a3d28', fontSize:'1.05rem'}}>
             Creamos productos herbales y experiencias educativas que promueven el autocuidado, el bienestar, el placer y la conexion con la naturaleza a traves de las plantas medicinales.
           </p>
-          <p className="font-body leading-relaxed mb-8" style={{color:'#4a5e42', fontSize:'0.95rem'}}>
+          <p className="font-body leading-relaxed mb-8" style={{color:'#0a3d28', fontSize:'0.95rem'}}>
             Recuperamos saberes ancestrales, remedios populares y el poder de las plantas para el cuidado cotidiano. Nuestra linea incluye aceites, pomadas, banos herbales, tinturas, perfumes botanicos e infusiones.
           </p>
 
@@ -143,15 +220,15 @@ const Nosotros = () => (
               'Perfumes botanicos',
               'Banos herbales',
             ].map(t => (
-              <div key={t} className="flex items-center gap-2 py-2 px-3 border" style={{borderColor:'#c8bfa8', background:'white'}}>
-                <CheckCircle size={13} style={{color:'#5C6B3A', flexShrink:0}} />
-                <span className="font-body text-sm" style={{color:'#2d4a22'}}>{t}</span>
+              <div key={t} className="flex items-center gap-2 py-2 px-3 border" style={{borderColor:'#a8dec0', background:'white'}}>
+                <CheckCircle size={13} style={{color:'#146b42', flexShrink:0}} />
+                <span className="font-body text-sm" style={{color:'#0a3d28'}}>{t}</span>
               </div>
             ))}
           </div>
 
           <Link to="/tienda" className="inline-flex items-center gap-2 font-body font-semibold text-sm tracking-wide px-6 py-3 transition-colors"
-            style={{background:'#1E2E1A', color:'#F5F0E1'}}>
+            style={{background:'#052a1c', color:'#F5F0E1'}}>
             Ver todos los productos <ArrowRight size={15} />
           </Link>
         </div>
@@ -159,14 +236,14 @@ const Nosotros = () => (
         {/* Columna derecha */}
         <div className="space-y-5">
           {/* Tarjeta INVIMA */}
-          <div className="p-8 border-l-4" style={{background:'#1E2E1A', borderLeftColor:'#C8874A'}}>
+          <div className="p-8 border-l-4" style={{background:'#052a1c', borderLeftColor:'#e0a83e'}}>
             <div className="flex items-start gap-4">
               <div className="p-3 shrink-0" style={{background:'rgba(200,135,74,0.15)'}}>
-                <Award size={22} style={{color:'#C8874A'}} />
+                <Award size={22} style={{color:'#e0a83e'}} />
               </div>
               <div>
                 <h3 className="font-display font-bold text-lg mb-2" style={{color:'#F5F0E1'}}>Certificacion INVIMA</h3>
-                <p className="font-body text-sm leading-relaxed" style={{color:'#a8b8a0'}}>
+                <p className="font-body text-sm leading-relaxed" style={{color:'#6ec194'}}>
                   Todos nuestros productos cuentan con registro sanitario INVIMA, garantizando los mas altos estandares de calidad, seguridad y eficacia en cada elaboracion.
                 </p>
               </div>
@@ -175,12 +252,12 @@ const Nosotros = () => (
 
           {/* Tarjeta productos */}
           <div className="p-8 border" style={{background:'white', borderColor:'#ddd6c2'}}>
-            <h3 className="font-display font-bold text-base mb-4" style={{color:'#1E2E1A'}}>Nuestra linea de productos</h3>
+            <h3 className="font-display font-bold text-base mb-4" style={{color:'#052a1c'}}>Nuestra linea de productos</h3>
             <div className="space-y-2">
               {['Aceites esenciales y de portador','Pomadas y cremas topicas','Banos herbales terapeuticos','Tinturas y extractos botanicos','Perfumes botanicos naturales','Infusiones y tes medicinales'].map(p => (
                 <div key={p} className="flex items-center gap-2 py-1.5 border-b last:border-0" style={{borderColor:'#ede8da'}}>
-                  <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{background:'#C8874A'}} />
-                  <span className="font-body text-sm" style={{color:'#3d5a35'}}>{p}</span>
+                  <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{background:'#e0a83e'}} />
+                  <span className="font-body text-sm" style={{color:'#0a3d28'}}>{p}</span>
                 </div>
               ))}
             </div>
@@ -193,13 +270,13 @@ const Nosotros = () => (
 
 // ── POR QUE — verde oscuro fondo, letras claras ───────────
 const PorQue = () => (
-  <section style={{background:'#1E2E1A', padding:'5rem 0'}}>
+  <section style={{background:'#052a1c', padding:'5rem 0'}}>
     <div className="max-w-7xl mx-auto px-6 lg:px-12">
       <div className="text-center mb-14">
         <div className="flex items-center justify-center gap-3 mb-4">
-          <div className="h-px w-10" style={{background:'#C8874A'}} />
-          <span className="font-body text-xs tracking-widest uppercase font-semibold" style={{color:'#C8874A'}}>Nuestra diferencia</span>
-          <div className="h-px w-10" style={{background:'#C8874A'}} />
+          <div className="h-px w-10" style={{background:'#e0a83e'}} />
+          <span className="font-body text-xs tracking-widest uppercase font-semibold" style={{color:'#e0a83e'}}>Nuestra diferencia</span>
+          <div className="h-px w-10" style={{background:'#e0a83e'}} />
         </div>
         <h2 className="font-display font-bold" style={{fontSize:'clamp(1.8rem,3vw,2.5rem)', color:'#F5F0E1'}}>
           Por que elegir Yerbateras
@@ -216,7 +293,7 @@ const PorQue = () => (
           <div key={f.num} className="p-7 border transition-all duration-300 group" style={{borderColor:'rgba(245,240,225,0.08)', background:'rgba(245,240,225,0.03)'}}>
             <div className="font-display font-bold mb-4" style={{fontSize:'2rem', color:'rgba(200,135,74,0.3)'}}>{f.num}</div>
             <h3 className="font-display font-bold text-base mb-3" style={{color:'#F5F0E1'}}>{f.titulo}</h3>
-            <p className="font-body text-sm leading-relaxed" style={{color:'#8fa882'}}>{f.desc}</p>
+            <p className="font-body text-sm leading-relaxed" style={{color:'#6ec194'}}>{f.desc}</p>
           </div>
         ))}
       </div>
@@ -230,10 +307,10 @@ const Equipo = () => (
     <div className="max-w-7xl mx-auto px-6 lg:px-12">
       <div className="mb-14">
         <div className="flex items-center gap-3 mb-4">
-          <div className="h-px w-10" style={{background:'#C8874A'}} />
-          <span className="font-body text-xs tracking-widest uppercase font-semibold" style={{color:'#C8874A'}}>El equipo</span>
+          <div className="h-px w-10" style={{background:'#e0a83e'}} />
+          <span className="font-body text-xs tracking-widest uppercase font-semibold" style={{color:'#e0a83e'}}>El equipo</span>
         </div>
-        <h2 className="font-display font-bold" style={{fontSize:'clamp(1.8rem,3vw,2.5rem)', color:'#1E2E1A'}}>
+        <h2 className="font-display font-bold" style={{fontSize:'clamp(1.8rem,3vw,2.5rem)', color:'#052a1c'}}>
           Quienes hacen posible Yerbateras
         </h2>
       </div>
@@ -241,27 +318,27 @@ const Equipo = () => (
       <div className="grid md:grid-cols-2 gap-8">
         {/* Estefania */}
         <div className="flex flex-col overflow-hidden border" style={{borderColor:'#ddd6c2', background:'white'}}>
-          <div className="px-8 py-6 flex items-center gap-5" style={{background:'#1E2E1A'}}>
-            <div className="w-16 h-16 flex items-center justify-center shrink-0 font-display font-bold text-2xl" style={{background:'#C8874A', color:'#1E2E1A'}}>
+          <div className="px-8 py-6 flex items-center gap-5" style={{background:'#052a1c'}}>
+            <div className="w-16 h-16 flex items-center justify-center shrink-0 font-display font-bold text-2xl" style={{background:'#e0a83e', color:'#052a1c'}}>
               E
             </div>
             <div>
               <h3 className="font-display font-bold text-xl leading-tight" style={{color:'#F5F0E1'}}>
                 Estefania Pineros
               </h3>
-              <p className="font-body text-xs font-semibold tracking-widest uppercase mt-1.5" style={{color:'#C8874A'}}>
+              <p className="font-body text-xs font-semibold tracking-widest uppercase mt-1.5" style={{color:'#e0a83e'}}>
                 Fundadora y cara publica
               </p>
             </div>
           </div>
           <div className="px-8 py-7 flex-1" style={{background:'white'}}>
-            <p className="font-body leading-relaxed mb-6" style={{color:'#2d4a22', fontSize:'0.95rem'}}>
+            <p className="font-body leading-relaxed mb-6" style={{color:'#0a3d28', fontSize:'0.95rem'}}>
               Herbolaria con mas de 10 anos investigando y elaborando productos naturales. Facilita talleres sobre plantas medicinales, autocuidado y saberes ancestrales. Es la voz y cara de Yerbateras, compartiendo el conocimiento herbolario con la comunidad.
             </p>
             <div className="space-y-2">
               {['Investigacion y desarrollo herbolario','Talleres de plantas medicinales','Vocera y representante de la marca','Educacion popular y autocuidado'].map(item => (
-                <div key={item} className="flex items-center gap-2.5 text-sm font-body py-1 border-b last:border-0" style={{color:'#3d5a35', borderColor:'#ede8da'}}>
-                  <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{background:'#C8874A'}} />
+                <div key={item} className="flex items-center gap-2.5 text-sm font-body py-1 border-b last:border-0" style={{color:'#0a3d28', borderColor:'#ede8da'}}>
+                  <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{background:'#e0a83e'}} />
                   {item}
                 </div>
               ))}
@@ -271,8 +348,8 @@ const Equipo = () => (
 
         {/* Gloria */}
         <div className="flex flex-col overflow-hidden border" style={{borderColor:'#ddd6c2', background:'white'}}>
-          <div className="px-8 py-6 flex items-center gap-5" style={{background:'#5C6B3A'}}>
-            <div className="w-16 h-16 flex items-center justify-center shrink-0 font-display font-bold text-2xl" style={{background:'#F5F0E1', color:'#1E2E1A'}}>
+          <div className="px-8 py-6 flex items-center gap-5" style={{background:'#146b42'}}>
+            <div className="w-16 h-16 flex items-center justify-center shrink-0 font-display font-bold text-2xl" style={{background:'#F5F0E1', color:'#052a1c'}}>
               G
             </div>
             <div>
@@ -285,13 +362,13 @@ const Equipo = () => (
             </div>
           </div>
           <div className="px-8 py-7 flex-1" style={{background:'white'}}>
-            <p className="font-body leading-relaxed mb-6" style={{color:'#2d4a22', fontSize:'0.95rem'}}>
+            <p className="font-body leading-relaxed mb-6" style={{color:'#0a3d28', fontSize:'0.95rem'}}>
               Responsable de la elaboracion artesanal de cada uno de los productos Yerbateras, garantizando la calidad en cada proceso. Gestiona el despacho y seguimiento de todos los pedidos para que lleguen perfectos a cada cliente.
             </p>
             <div className="space-y-2">
               {['Elaboracion artesanal de productos','Control de calidad en cada proceso','Gestion y despacho de envios','Manejo de inventario y materias primas'].map(item => (
-                <div key={item} className="flex items-center gap-2.5 text-sm font-body py-1 border-b last:border-0" style={{color:'#3d5a35', borderColor:'#ede8da'}}>
-                  <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{background:'#5C6B3A'}} />
+                <div key={item} className="flex items-center gap-2.5 text-sm font-body py-1 border-b last:border-0" style={{color:'#0a3d28', borderColor:'#ede8da'}}>
+                  <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{background:'#146b42'}} />
                   {item}
                 </div>
               ))}
@@ -320,14 +397,14 @@ const ProductosDestacados = () => {
         <div className="flex items-end justify-between mb-12">
           <div>
             <div className="flex items-center gap-3 mb-3">
-              <div className="h-px w-10" style={{background:'#C8874A'}} />
-              <span className="font-body text-xs tracking-widest uppercase font-semibold" style={{color:'#C8874A'}}>Seleccion especial</span>
+              <div className="h-px w-10" style={{background:'#e0a83e'}} />
+              <span className="font-body text-xs tracking-widest uppercase font-semibold" style={{color:'#e0a83e'}}>Seleccion especial</span>
             </div>
-            <h2 className="font-display font-bold" style={{fontSize:'clamp(1.6rem,2.5vw,2.2rem)', color:'#1E2E1A'}}>
+            <h2 className="font-display font-bold" style={{fontSize:'clamp(1.6rem,2.5vw,2.2rem)', color:'#052a1c'}}>
               Productos destacados
             </h2>
           </div>
-          <Link to="/tienda" className="hidden md:flex items-center gap-2 font-body text-sm font-semibold transition-colors" style={{color:'#5C6B3A'}}>
+          <Link to="/tienda" className="hidden md:flex items-center gap-2 font-body text-sm font-semibold transition-colors" style={{color:'#146b42'}}>
             Ver todos <ArrowRight size={14} />
           </Link>
         </div>
@@ -338,18 +415,18 @@ const ProductosDestacados = () => {
               <div className="h-48 flex items-center justify-center overflow-hidden" style={{background:'#ede8da'}}>
                 {p.imagen_principal
                   ? <img src={p.imagen_principal} alt={p.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                  : <Leaf size={40} style={{color:'#c8bfa8'}} />}
+                  : <Leaf size={40} style={{color:'#a8dec0'}} />}
               </div>
               <div className="p-5">
-                <p className="font-body text-xs tracking-widest uppercase mb-1.5 font-semibold" style={{color:'#C8874A'}}>{p.categoria}</p>
-                <h3 className="font-display font-bold text-base mb-2 leading-snug line-clamp-2" style={{color:'#1E2E1A'}}>{p.nombre}</h3>
-                <p className="font-body text-xs leading-relaxed line-clamp-2 mb-4" style={{color:'#5a7052'}}>{p.descripcion_corta}</p>
+                <p className="font-body text-xs tracking-widest uppercase mb-1.5 font-semibold" style={{color:'#e0a83e'}}>{p.categoria}</p>
+                <h3 className="font-display font-bold text-base mb-2 leading-snug line-clamp-2" style={{color:'#052a1c'}}>{p.nombre}</h3>
+                <p className="font-body text-xs leading-relaxed line-clamp-2 mb-4" style={{color:'#146b42'}}>{p.descripcion_corta}</p>
                 <div className="flex items-center justify-between pt-3 border-t" style={{borderColor:'#ede8da'}}>
-                  <span className="font-display font-bold text-lg" style={{color:'#5C6B3A'}}>
+                  <span className="font-display font-bold text-lg" style={{color:'#146b42'}}>
                     ${Number(p.precio).toLocaleString('es-CO')}
                   </span>
                   {p.calificacion_promedio > 0 && (
-                    <span className="flex items-center gap-1 text-xs font-body" style={{color:'#C8874A'}}>
+                    <span className="flex items-center gap-1 text-xs font-body" style={{color:'#e0a83e'}}>
                       <Star size={11} fill="currentColor" /> {Number(p.calificacion_promedio).toFixed(1)}
                     </span>
                   )}
@@ -360,7 +437,7 @@ const ProductosDestacados = () => {
         </div>
 
         <div className="text-center mt-8 md:hidden">
-          <Link to="/tienda" className="inline-flex items-center gap-2 font-body font-semibold px-6 py-3 text-sm" style={{background:'#1E2E1A', color:'#F5F0E1'}}>
+          <Link to="/tienda" className="inline-flex items-center gap-2 font-body font-semibold px-6 py-3 text-sm" style={{background:'#052a1c', color:'#F5F0E1'}}>
             Ver todos los productos <ArrowRight size={15} />
           </Link>
         </div>
@@ -371,7 +448,7 @@ const ProductosDestacados = () => {
 
 // ── CTA CONTACTO ──────────────────────────────────────────
 const CtaContacto = () => (
-  <section style={{background:'#5C6B3A', padding:'4rem 0'}}>
+  <section style={{background:'#146b42', padding:'4rem 0'}}>
     <div className="max-w-5xl mx-auto px-6 text-center">
       <h2 className="font-display font-bold mb-3" style={{fontSize:'clamp(1.5rem,2.5vw,2rem)', color:'#F5F0E1'}}>
         Conecta con Yerbateras
@@ -392,7 +469,7 @@ const CtaContacto = () => (
         </a>
         <a href={WHATSAPP} target="_blank" rel="noreferrer"
           className="inline-flex items-center gap-2.5 font-body font-semibold text-sm px-6 py-3 transition-all duration-200"
-          style={{background:'#C8874A', color:'#1E2E1A'}}>
+          style={{background:'#e0a83e', color:'#052a1c'}}>
           <svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
           Escribenos por WhatsApp
         </a>
@@ -429,23 +506,23 @@ const Carrusel = () => {
 
   const slides = [
     {
-      bg: 'linear-gradient(160deg,#1E2E1A 0%,#2d4a22 60%,#1a3518 100%)',
+      bg: 'linear-gradient(160deg,#052a1c 0%,#0a3d28 60%,#1a3518 100%)',
       tag: 'Certificacion INVIMA',
-      title: <>El poder curativo<br /><em style={{color:'#C8874A'}}>de las plantas</em></>,
+      title: <>El poder curativo<br /><em style={{color:'#e0a83e'}}>de las plantas</em></>,
       desc: 'Elaboramos productos herbales artesanales con plantas medicinales seleccionadas por sus propiedades terapeuticas. Mas de 10 anos recuperando saberes ancestrales.',
       cta: { label:'Conocer mas', href:'#nosotros', gold: true },
       deco: (
         <>
           <svg style={{position:'absolute',top:-30,right:-20,width:260,height:260,opacity:0.08,transform:'rotate(20deg)',pointerEvents:'none'}} viewBox="0 0 200 200">
-            <path d="M100 10 Q160 10 180 80 Q200 150 100 190 Q0 150 20 80 Q40 10 100 10Z" fill="#5C6B3A"/>
-            <path d="M100 10 L100 190" stroke="#8fa882" strokeWidth="1.5" fill="none" strokeDasharray="4 4"/>
-            <path d="M100 50 Q70 60 50 90" stroke="#8fa882" strokeWidth="0.8" fill="none"/>
-            <path d="M100 80 Q130 90 150 120" stroke="#8fa882" strokeWidth="0.8" fill="none"/>
-            <path d="M100 110 Q65 120 45 145" stroke="#8fa882" strokeWidth="0.8" fill="none"/>
+            <path d="M100 10 Q160 10 180 80 Q200 150 100 190 Q0 150 20 80 Q40 10 100 10Z" fill="#146b42"/>
+            <path d="M100 10 L100 190" stroke="#6ec194" strokeWidth="1.5" fill="none" strokeDasharray="4 4"/>
+            <path d="M100 50 Q70 60 50 90" stroke="#6ec194" strokeWidth="0.8" fill="none"/>
+            <path d="M100 80 Q130 90 150 120" stroke="#6ec194" strokeWidth="0.8" fill="none"/>
+            <path d="M100 110 Q65 120 45 145" stroke="#6ec194" strokeWidth="0.8" fill="none"/>
           </svg>
           <svg style={{position:'absolute',bottom:-40,left:-10,width:200,height:200,opacity:0.06,pointerEvents:'none'}} viewBox="0 0 200 200">
-            <ellipse cx="100" cy="100" rx="70" ry="95" fill="#3d5a35"/>
-            <line x1="100" y1="10" x2="100" y2="190" stroke="#5C6B3A" strokeWidth="1.2"/>
+            <ellipse cx="100" cy="100" rx="70" ry="95" fill="#0a3d28"/>
+            <line x1="100" y1="10" x2="100" y2="190" stroke="#146b42" strokeWidth="1.2"/>
           </svg>
         </>
       ),
@@ -453,24 +530,24 @@ const Carrusel = () => {
     {
       bg: '#162210',
       tag: 'Linea de productos',
-      title: <>Aceites, tinturas<br /><em style={{color:'#8fa882'}}>y mucho mas</em></>,
+      title: <>Aceites, tinturas<br /><em style={{color:'#6ec194'}}>y mucho mas</em></>,
       desc: 'Aceites esenciales, pomadas, banos herbales, tinturas, perfumes botanicos e infusiones. Cada producto elaborado a mano con ingredientes 100% naturales.',
       extra: (
         <div style={{display:'flex',gap:8,justifyContent:'center',flexWrap:'wrap',marginBottom:20}}>
           {['Aceites','Pomadas','Tinturas','Infusiones','Banos herbales'].map(p => (
-            <span key={p} style={{fontFamily:'Georgia,serif',fontSize:'0.72rem',color:'#8fa882',border:'1px solid rgba(143,168,130,0.3)',padding:'3px 10px',letterSpacing:'0.05em'}}>{p}</span>
+            <span key={p} style={{fontFamily:'Georgia,serif',fontSize:'0.72rem',color:'#6ec194',border:'1px solid rgba(143,168,130,0.3)',padding:'3px 10px',letterSpacing:'0.05em'}}>{p}</span>
           ))}
         </div>
       ),
       cta: { label:'Ver tienda', href:'/tienda', gold: false },
       deco: (
         <svg style={{position:'absolute',top:20,left:-30,width:240,height:240,opacity:0.07,transform:'rotate(-10deg)',pointerEvents:'none'}} viewBox="0 0 200 200">
-          <path d="M30 180 Q80 20 160 30 Q200 35 170 100 Q140 160 30 180Z" fill="#C8874A"/>
+          <path d="M30 180 Q80 20 160 30 Q200 35 170 100 Q140 160 30 180Z" fill="#e0a83e"/>
         </svg>
       ),
     },
     {
-      bg: 'linear-gradient(135deg,#1E2E1A 0%,#3d5a35 100%)',
+      bg: 'linear-gradient(135deg,#052a1c 0%,#0a3d28 100%)',
       tag: 'El equipo',
       title: <>Estefania Pineros<br /></>,
       desc: 'Herbolaria y fundadora. Mas de 10 anos investigando plantas medicinales, elaborando productos naturales y facilitando talleres sobre autocuidado y saberes ancestrales.',
@@ -480,7 +557,7 @@ const Carrusel = () => {
         <div style={{position:'absolute',right:'8%',top:'50%',transform:'translateY(-50%)',width:160,height:160,borderRadius:'50%',border:'1px solid rgba(200,135,74,0.2)',display:'flex',alignItems:'center',justifyContent:'center',pointerEvents:'none'}}>
           <div style={{width:120,height:120,borderRadius:'50%',border:'1px solid rgba(200,135,74,0.15)',display:'flex',alignItems:'center',justifyContent:'center'}}>
             <div style={{width:76,height:76,background:'rgba(200,135,74,0.12)',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center'}}>
-              <span style={{fontFamily:'Georgia,serif',fontSize:'2rem',fontWeight:'bold',color:'#C8874A',fontStyle:'italic'}}>E</span>
+              <span style={{fontFamily:'Georgia,serif',fontSize:'2rem',fontWeight:'bold',color:'#e0a83e',fontStyle:'italic'}}>E</span>
             </div>
           </div>
         </div>
@@ -489,14 +566,14 @@ const Carrusel = () => {
     {
       bg: '#111e0f',
       tag: 'Calidad garantizada',
-      title: <>Certificacion<br /><em style={{color:'#C8874A'}}>INVIMA</em></>,
+      title: <>Certificacion<br /><em style={{color:'#e0a83e'}}>INVIMA</em></>,
       desc: 'Todos nuestros productos cuentan con registro sanitario INVIMA. Elaboracion artesanal con los mas altos estandares de calidad, seguridad y eficacia.',
       extra: (
         <div style={{display:'flex',gap:28,justifyContent:'center',marginBottom:24}}>
           {[['10+','Anos'],['100%','Natural'],['INVIMA','Cert.']].map(([n,l]) => (
             <div key={l} style={{textAlign:'center'}}>
-              <div style={{fontFamily:'Georgia,serif',fontSize:'1.4rem',fontWeight:'bold',color:'#C8874A'}}>{n}</div>
-              <div style={{fontFamily:'Georgia,serif',fontSize:'0.68rem',color:'#5a7052',letterSpacing:'0.06em',textTransform:'uppercase',marginTop:2}}>{l}</div>
+              <div style={{fontFamily:'Georgia,serif',fontSize:'1.4rem',fontWeight:'bold',color:'#e0a83e'}}>{n}</div>
+              <div style={{fontFamily:'Georgia,serif',fontSize:'0.68rem',color:'#146b42',letterSpacing:'0.06em',textTransform:'uppercase',marginTop:2}}>{l}</div>
             </div>
           ))}
         </div>
@@ -511,9 +588,9 @@ const Carrusel = () => {
       ),
     },
     {
-      bg: 'linear-gradient(160deg,#2d4a22 0%,#1E2E1A 100%)',
+      bg: 'linear-gradient(160deg,#0a3d28 0%,#052a1c 100%)',
       tag: 'Conecta con nosotras',
-      title: <>Escribenos<br /><em style={{color:'#C8874A'}}>cuando quieras</em></>,
+      title: <>Escribenos<br /><em style={{color:'#e0a83e'}}>cuando quieras</em></>,
       desc: 'Siguenos en redes sociales o escribenos directamente. Estamos aqui para orientarte sobre nuestros productos, talleres y todo lo relacionado con las plantas medicinales.',
       extra: (
         <div style={{display:'flex',gap:10,justifyContent:'center',flexWrap:'wrap',marginBottom:20}}>
@@ -522,7 +599,7 @@ const Carrusel = () => {
             <Instagram size={15}/> @yerbaterass
           </a>
           <a href="https://wa.me/573102631592" target="_blank" rel="noreferrer"
-            style={{display:'inline-flex',alignItems:'center',gap:8,padding:'9px 18px',background:'#C8874A',color:'#1E2E1A',fontFamily:'Georgia,serif',fontSize:'0.8rem',fontWeight:'bold',textDecoration:'none'}}>
+            style={{display:'inline-flex',alignItems:'center',gap:8,padding:'9px 18px',background:'#e0a83e',color:'#052a1c',fontFamily:'Georgia,serif',fontSize:'0.8rem',fontWeight:'bold',textDecoration:'none'}}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
             WhatsApp
           </a>
@@ -532,10 +609,10 @@ const Carrusel = () => {
       deco: (
         <>
           <svg style={{position:'absolute',top:0,right:0,width:240,height:240,opacity:0.05,transform:'rotate(45deg)',pointerEvents:'none'}} viewBox="0 0 200 200">
-            <path d="M100 0 Q200 0 200 100 Q200 200 100 200 Q0 200 0 100 Q0 0 100 0Z" fill="#C8874A"/>
+            <path d="M100 0 Q200 0 200 100 Q200 200 100 200 Q0 200 0 100 Q0 0 100 0Z" fill="#e0a83e"/>
           </svg>
           <svg style={{position:'absolute',bottom:0,left:0,width:160,height:160,opacity:0.05,pointerEvents:'none'}} viewBox="0 0 150 150">
-            <path d="M0 150 Q0 0 150 0 L0 0Z" fill="#8fa882"/>
+            <path d="M0 150 Q0 0 150 0 L0 0Z" fill="#6ec194"/>
           </svg>
         </>
       ),
@@ -553,7 +630,7 @@ const Carrusel = () => {
   const s = slides[cur];
 
   return (
-    <section style={{background:'#1E2E1A', overflow:'hidden', border:'none'}}
+    <section style={{background:'#052a1c', overflow:'hidden', border:'none'}}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onTouchStart={onTouchStart}
@@ -562,7 +639,7 @@ const Carrusel = () => {
       {/* Barra de progreso */}
       <div style={{height:2, background:'rgba(245,240,225,0.06)', position:'relative'}}>
         <div key={cur} style={{
-          position:'absolute', left:0, top:0, height:'100%', background:'#C8874A',
+          position:'absolute', left:0, top:0, height:'100%', background:'#e0a83e',
           animation: paused ? 'none' : `progress-fill ${AUTO_MS}ms linear forwards`,
         }}/>
         <style>{`@keyframes progress-fill{from{width:0%}to{width:100%}}`}</style>
@@ -577,8 +654,8 @@ const Carrusel = () => {
         {s.deco}
 
         {/* Lineas laterales doradas */}
-        <div style={{position:'absolute', left:60, top:'50%', transform:'translateY(-50%)', width:1, height:50, background:'linear-gradient(180deg,transparent,#C8874A,transparent)', opacity:0.4}} />
-        <div style={{position:'absolute', right:60, top:'50%', transform:'translateY(-50%)', width:1, height:50, background:'linear-gradient(180deg,transparent,#C8874A,transparent)', opacity:0.4}} />
+        <div style={{position:'absolute', left:60, top:'50%', transform:'translateY(-50%)', width:1, height:50, background:'linear-gradient(180deg,transparent,#e0a83e,transparent)', opacity:0.4}} />
+        <div style={{position:'absolute', right:60, top:'50%', transform:'translateY(-50%)', width:1, height:50, background:'linear-gradient(180deg,transparent,#e0a83e,transparent)', opacity:0.4}} />
 
         {/* Contenido */}
         <div style={{
@@ -589,8 +666,8 @@ const Carrusel = () => {
           transition:'opacity 0.4s ease',
         }}>
           {/* Tag */}
-          <div style={{display:'inline-flex', alignItems:'center', gap:7, padding:'4px 14px', border:'1px solid rgba(200,135,74,0.45)', color:'#C8874A', fontFamily:'Georgia,serif', fontSize:'0.7rem', letterSpacing:'0.12em', textTransform:'uppercase', marginBottom:16}}>
-            <div style={{width:5, height:5, borderRadius:'50%', background:'#C8874A'}} />
+          <div style={{display:'inline-flex', alignItems:'center', gap:7, padding:'4px 14px', border:'1px solid rgba(200,135,74,0.45)', color:'#e0a83e', fontFamily:'Georgia,serif', fontSize:'0.7rem', letterSpacing:'0.12em', textTransform:'uppercase', marginBottom:16}}>
+            <div style={{width:5, height:5, borderRadius:'50%', background:'#e0a83e'}} />
             {s.tag}
           </div>
 
@@ -600,10 +677,10 @@ const Carrusel = () => {
           </h2>
 
           {/* Linea */}
-          {s.extraLeft && <div style={{width:36, height:2, background:'#C8874A', margin:'0 0 16px'}} />}
+          {s.extraLeft && <div style={{width:36, height:2, background:'#e0a83e', margin:'0 0 16px'}} />}
 
           {/* Descripcion */}
-          <p style={{fontFamily:'Georgia,serif', fontSize:'0.9rem', lineHeight:1.8, color:'#a8b8a0', margin:'0 0 20px', maxWidth:440}}>
+          <p style={{fontFamily:'Georgia,serif', fontSize:'0.9rem', lineHeight:1.8, color:'#6ec194', margin:'0 0 20px', maxWidth:440}}>
             {s.desc}
           </p>
 
@@ -617,8 +694,8 @@ const Carrusel = () => {
                 display:'inline-flex', alignItems:'center', gap:8,
                 padding:'10px 24px', textDecoration:'none',
                 fontFamily:'Georgia,serif', fontSize:'0.85rem', fontWeight:'bold', letterSpacing:'0.04em',
-                background: s.cta.gold ? '#C8874A' : 'transparent',
-                color: s.cta.gold ? '#1E2E1A' : '#F5F0E1',
+                background: s.cta.gold ? '#e0a83e' : 'transparent',
+                color: s.cta.gold ? '#052a1c' : '#F5F0E1',
                 border: s.cta.gold ? 'none' : '1px solid rgba(245,240,225,0.3)',
               }}>
               {s.cta.label} &rarr;
@@ -650,7 +727,7 @@ const Carrusel = () => {
             style={{
               width: i === cur ? 22 : 7, height:7, padding:0,
               borderRadius: i === cur ? 4 : '50%',
-              background: i === cur ? '#C8874A' : 'rgba(245,240,225,0.25)',
+              background: i === cur ? '#e0a83e' : 'rgba(245,240,225,0.25)',
               border:'none', cursor:'pointer', transition:'all 0.35s ease',
             }} />
         ))}
@@ -662,13 +739,13 @@ const Carrusel = () => {
           <button key={i} onClick={() => goTo(i)}
             style={{
               flex:1, padding:'11px 8px', background: i === cur ? 'rgba(200,135,74,0.09)' : 'transparent',
-              border:'none', borderTop: i === cur ? '2px solid #C8874A' : '2px solid transparent',
+              border:'none', borderTop: i === cur ? '2px solid #e0a83e' : '2px solid transparent',
               cursor:'pointer', display:'flex', flexDirection:'column', alignItems:'center', gap:4, transition:'all 0.2s',
             }}>
-            <span style={{color: i === cur ? '#C8874A' : '#5a7052', transition:'color 0.2s', lineHeight:0}}>
+            <span style={{color: i === cur ? '#e0a83e' : '#146b42', transition:'color 0.2s', lineHeight:0}}>
               {t.icon}
             </span>
-            <span style={{fontFamily:'Georgia,serif', fontSize:'0.68rem', color: i === cur ? '#C8874A' : '#5a7052', letterSpacing:'0.05em', whiteSpace:'nowrap'}}>
+            <span style={{fontFamily:'Georgia,serif', fontSize:'0.68rem', color: i === cur ? '#e0a83e' : '#146b42', letterSpacing:'0.05em', whiteSpace:'nowrap'}}>
               {t.label}
             </span>
           </button>
@@ -683,6 +760,7 @@ export default function Landing() {
     <>
       <Hero />
       <Confianza />
+      <MasVendidos />
       <Carrusel />
       <Nosotros />
       <PorQue />
