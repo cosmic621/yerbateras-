@@ -13,21 +13,15 @@ const TEMAS = [
     id: 'productos',
     pregunta: '¿Qué productos tienen?',
     keywords: ['producto', 'productos', 'catalogo', 'que venden', 'que tienen', 'articulos'],
-    respuesta: 'Tenemos aceites y tinturas, infusiones y tés, cremas y tópicos, suplementos, kits de regalo y nuestra línea de cannabis medicinal — todo elaborado artesanalmente y con certificación INVIMA.',
+    respuesta: 'Tenemos aceites y tinturas, infusiones y tés, cremas y tópicos, suplementos, kits de regalo y nuestra línea de cannabis medicinal — todo elaborado artesanalmente. También tenemos masajes, talleres y eventos.',
     accion: { label: 'Ver toda la tienda', to: '/tienda' },
   },
   {
     id: 'cannabis',
     pregunta: '¿Tienen cannabis medicinal?',
     keywords: ['cbd', 'cannabis', 'marihuana', 'thc'],
-    respuesta: 'Sí, contamos con una línea de cannabis medicinal certificada. Puedes ver toda la información y presentaciones en nuestra tienda, en la categoría "Cannabis Medicinal".',
+    respuesta: 'Sí, contamos con una línea de cannabis medicinal. Puedes ver toda la información y presentaciones en nuestra tienda, en la categoría "Cannabis Medicinal".',
     accion: { label: 'Ver cannabis medicinal', to: '/tienda?categoria=cannabis-medicinal' },
-  },
-  {
-    id: 'invima',
-    pregunta: '¿Están certificados por INVIMA?',
-    keywords: ['invima', 'certificado', 'certificacion', 'registro sanitario'],
-    respuesta: 'Sí, todos nuestros productos cuentan con registro sanitario y certificación INVIMA. Puedes ver el detalle de cada producto en su página individual dentro de la tienda.',
   },
   {
     id: 'envios',
@@ -40,14 +34,28 @@ const TEMAS = [
     id: 'pagos',
     pregunta: '¿Qué métodos de pago aceptan?',
     keywords: ['pago', 'pagar', 'tarjeta', 'pse', 'contraentrega', 'efectivo'],
-    respuesta: 'Aceptamos tarjeta de crédito/débito, PSE y pago contraentrega en las ciudades donde está disponible.',
+    respuesta: 'Aceptamos tarjeta de crédito/débito, PSE y Nequi. Todos los pagos se hacen en línea: no manejamos pago contraentrega.',
   },
   {
     id: 'citas',
     pregunta: 'Quiero agendar un masaje',
     keywords: ['masaje', 'cita', 'agendar', 'relajante', 'terapia'],
-    respuesta: 'Puedes agendar tu masaje directamente desde nuestra página de citas: eliges el servicio, la fecha y la hora, y te confirmamos por correo.',
+    respuesta: 'Puedes agendar tu masaje desde nuestra página de citas: eliges el servicio, la fecha y la hora, y pagas en línea para confirmarla. Las citas solo se pueden reprogramar (sin devolución de dinero) con mínimo 24 horas de anticipación.',
     accion: { label: 'Agendar una cita', to: '/citas' },
+  },
+  {
+    id: 'talleres',
+    pregunta: '¿Cómo me inscribo a un taller?',
+    keywords: ['taller', 'talleres', 'curso', 'inscribir', 'inscripcion', 'clase'],
+    respuesta: 'En la página de talleres eliges el taller, tus datos y cuántas personas van. Para reservar tu cupo pagas mínimo el 50% en línea; el resto lo puedes pagar después.',
+    accion: { label: 'Ver talleres', to: '/talleres' },
+  },
+  {
+    id: 'eventos',
+    pregunta: '¿Qué eventos hay?',
+    keywords: ['evento', 'eventos', 'calendario', 'feria', 'proximo'],
+    respuesta: 'En nuestro calendario de eventos puedes ver las fechas del mes; pasa el cursor sobre un día para ver el flyer.',
+    accion: { label: 'Ver calendario', to: '/eventos' },
   },
   {
     id: 'horario',
@@ -129,7 +137,7 @@ export default function AsistenteVirtual() {
     btn: {
       position:'fixed', bottom:'5.5rem', right:'1.5rem', zIndex:50,
       width:52, height:52, borderRadius:'50%',
-      background:'#146b42', border:'none', cursor:'pointer',
+      background:'#2f6549', border:'none', cursor:'pointer',
       display:'flex', alignItems:'center', justifyContent:'center',
       boxShadow:'0 4px 16px rgba(92,107,58,0.5)',
       transition:'all 0.25s ease'
@@ -138,55 +146,55 @@ export default function AsistenteVirtual() {
       position:'fixed', bottom:'5.5rem', right:'1.5rem', zIndex:50,
       width:340, background:'white',
       boxShadow:'0 12px 40px rgba(0,0,0,0.18)',
-      border:'1px solid #ddd6c2',
+      border:'1px solid #dcd8c9',
       display:'flex', flexDirection:'column',
       transition:'height 0.3s ease',
       height: minimizado ? 52 : 500
     },
     header: {
-      background:'#052a1c',
+      background:'#0f3c27',
       padding:'0 16px',
       height:52,
       display:'flex', alignItems:'center', justifyContent:'space-between',
       flexShrink:0,
-      borderBottom:'2px solid #e0a83e'
+      borderBottom:'2px solid #c6a15b'
     },
     msgs: {
       flex:1, overflowY:'auto', padding:'16px',
-      background:'#fdfbf6', display:'flex', flexDirection:'column', gap:12
+      background:'#fbfaf6', display:'flex', flexDirection:'column', gap:12
     },
     msgUser: {
-      alignSelf:'flex-end', background:'#052a1c', color:'#F5F0E1',
+      alignSelf:'flex-end', background:'#0f3c27', color:'#f6f3eb',
       padding:'8px 12px', maxWidth:'80%',
-      fontFamily:'Georgia,serif', fontSize:'0.82rem', lineHeight:1.6
+      fontFamily:'var(--font-marca)', fontSize:'0.82rem', lineHeight:1.6
     },
     msgBot: {
-      alignSelf:'flex-start', background:'white', color:'#0a3d28',
+      alignSelf:'flex-start', background:'white', color:'#16422e',
       padding:'8px 12px', maxWidth:'88%',
-      border:'1px solid #ddd6c2',
-      fontFamily:'Georgia,serif', fontSize:'0.82rem', lineHeight:1.6
+      border:'1px solid #dcd8c9',
+      fontFamily:'var(--font-marca)', fontSize:'0.82rem', lineHeight:1.6
     },
     inputWrap: {
-      borderTop:'1px solid #ddd6c2', padding:'10px 12px',
+      borderTop:'1px solid #dcd8c9', padding:'10px 12px',
       display:'flex', gap:8, background:'white', flexShrink:0
     },
     input: {
-      flex:1, border:'1px solid #ddd6c2', padding:'8px 12px',
-      fontFamily:'Georgia,serif', fontSize:'0.82rem', color:'#052a1c',
-      background:'#fdfbf6', outline:'none'
+      flex:1, border:'1px solid #dcd8c9', padding:'8px 12px',
+      fontFamily:'var(--font-marca)', fontSize:'0.82rem', color:'#0f3c27',
+      background:'#fbfaf6', outline:'none'
     },
     sendBtn: {
-      width:36, height:36, background:'#146b42', border:'none', cursor:'pointer',
+      width:36, height:36, background:'#2f6549', border:'none', cursor:'pointer',
       display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0
     },
     accionBtn: {
-      display:'inline-block', marginTop:8, fontFamily:'Georgia,serif', fontSize:'0.75rem',
-      fontWeight:'bold', color:'#052a1c', background:'#e0a83e', padding:'6px 12px',
+      display:'inline-block', marginTop:8, fontFamily:'var(--font-marca)', fontSize:'0.75rem',
+      fontWeight:'bold', color:'#0f3c27', background:'#c6a15b', padding:'6px 12px',
       textDecoration:'none', border:'none', cursor:'pointer'
     },
     temaBtn: {
-      display:'block', width:'100%', textAlign:'left', fontFamily:'Georgia,serif', fontSize:'0.76rem',
-      color:'#0a3d28', background:'white', border:'1px solid #a8dec0', padding:'6px 10px',
+      display:'block', width:'100%', textAlign:'left', fontFamily:'var(--font-marca)', fontSize:'0.76rem',
+      color:'#16422e', background:'white', border:'1px solid #c5d9cb', padding:'6px 10px',
       cursor:'pointer', marginBottom:5
     }
   };
@@ -196,11 +204,11 @@ export default function AsistenteVirtual() {
       {!abierto && (
         <button onClick={() => setAbierto(true)} style={S.btn} aria-label="Abrir asistente"
           onMouseEnter={e => { e.currentTarget.style.transform='scale(1.1)'; e.currentTarget.style.background='#4a5630'; }}
-          onMouseLeave={e => { e.currentTarget.style.transform='scale(1)'; e.currentTarget.style.background='#146b42'; }}>
+          onMouseLeave={e => { e.currentTarget.style.transform='scale(1)'; e.currentTarget.style.background='#2f6549'; }}>
           <MessageSquare size={22} color="white" />
           <span style={{
             position:'absolute', top:4, right:4, width:10, height:10,
-            borderRadius:'50%', background:'#e0a83e',
+            borderRadius:'50%', background:'#c6a15b',
             animation:'pulse-chat 2s ease-out infinite'
           }} />
           <style>{`@keyframes pulse-chat { 0%{transform:scale(1);opacity:1} 100%{transform:scale(2.5);opacity:0} }`}</style>
@@ -211,24 +219,24 @@ export default function AsistenteVirtual() {
         <div style={S.ventana}>
           <div style={S.header}>
             <div style={{display:'flex', alignItems:'center', gap:10}}>
-              <div style={{width:28, height:28, background:'#e0a83e', display:'flex', alignItems:'center', justifyContent:'center'}}>
-                <span style={{fontFamily:'Georgia,serif', fontWeight:'bold', color:'#052a1c', fontSize:'0.75rem', fontStyle:'italic'}}>Y</span>
+              <div style={{width:28, height:28, background:'#c6a15b', display:'flex', alignItems:'center', justifyContent:'center'}}>
+                <span style={{fontFamily:'var(--font-marca)', fontWeight:'bold', color:'#0f3c27', fontSize:'0.75rem', fontStyle:'italic'}}>Y</span>
               </div>
               <div>
-                <p style={{fontFamily:'Georgia,serif', fontSize:'0.82rem', fontWeight:'bold', color:'#F5F0E1', margin:0, lineHeight:1.2}}>Asistente Yerbateras</p>
+                <p style={{fontFamily:'var(--font-marca)', fontSize:'0.82rem', fontWeight:'bold', color:'#f6f3eb', margin:0, lineHeight:1.2}}>Asistente Yerbateras</p>
                 <div style={{display:'flex', alignItems:'center', gap:4}}>
                   <span style={{width:6, height:6, borderRadius:'50%', background:'#4ade80', display:'inline-block'}} />
-                  <span style={{fontFamily:'Georgia,serif', fontSize:'0.7rem', color:'#6ec194'}}>Respuestas rápidas</span>
+                  <span style={{fontFamily:'var(--font-marca)', fontSize:'0.7rem', color:'#9dbfa9'}}>Respuestas rápidas</span>
                 </div>
               </div>
             </div>
             <div style={{display:'flex', gap:4}}>
               <button onClick={() => setMinimizado(!minimizado)}
-                style={{background:'none', border:'none', cursor:'pointer', color:'#6ec194', padding:4, display:'flex', alignItems:'center'}}>
+                style={{background:'none', border:'none', cursor:'pointer', color:'#9dbfa9', padding:4, display:'flex', alignItems:'center'}}>
                 <Minus size={14} />
               </button>
               <button onClick={() => { setAbierto(false); setMinimizado(false); }}
-                style={{background:'none', border:'none', cursor:'pointer', color:'#6ec194', padding:4, display:'flex', alignItems:'center'}}>
+                style={{background:'none', border:'none', cursor:'pointer', color:'#9dbfa9', padding:4, display:'flex', alignItems:'center'}}>
                 <X size={14} />
               </button>
             </div>
@@ -250,7 +258,7 @@ export default function AsistenteVirtual() {
                 <div ref={endRef} />
               </div>
 
-              <div style={{padding:'10px 12px', borderTop:'1px solid #ede8da', background:'#fdfbf6', maxHeight:120, overflowY:'auto'}}>
+              <div style={{padding:'10px 12px', borderTop:'1px solid #ebe7dc', background:'#fbfaf6', maxHeight:120, overflowY:'auto'}}>
                 {TEMAS.map(tema => (
                   <button key={tema.id} onClick={() => responderTema(tema)} style={S.temaBtn}>
                     {tema.pregunta}

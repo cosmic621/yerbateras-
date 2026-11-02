@@ -4,35 +4,35 @@ import { Mail, Lock, User, Phone, Eye, EyeOff, CheckCircle } from 'lucide-react'
 import api from '../services/api';
 
 const C = {
-  page:  { minHeight:'100vh', background:'#052a1c', display:'flex', alignItems:'center', justifyContent:'center', padding:'2rem 1rem' },
+  page:  { minHeight:'100vh', background:'#0f3c27', display:'flex', alignItems:'center', justifyContent:'center', padding:'2rem 1rem' },
   card:  { width:'100%', maxWidth:460, background:'white', padding:'2.5rem', boxShadow:'0 20px 60px rgba(0,0,0,0.3)' },
-  label: { display:'block', fontFamily:'Georgia,serif', fontSize:'0.8rem', fontWeight:'bold', color:'#0a3d28', marginBottom:5 },
+  label: { display:'block', fontFamily:'var(--font-marca)', fontSize:'0.8rem', fontWeight:'bold', color:'#16422e', marginBottom:5 },
   wrap:  { position:'relative', marginBottom:'0.85rem' },
-  input: { width:'100%', padding:'10px 12px 10px 38px', border:'1px solid #ddd6c2', fontFamily:'Georgia,serif', fontSize:'0.85rem', color:'#052a1c', outline:'none', background:'#fdfbf6', boxSizing:'border-box' },
-  icon:  { position:'absolute', left:11, top:'50%', transform:'translateY(-50%)', color:'#6ec194', pointerEvents:'none' },
-  btn:   { width:'100%', padding:'12px', background:'#052a1c', color:'#F5F0E1', fontFamily:'Georgia,serif', fontSize:'0.88rem', fontWeight:'bold', border:'none', cursor:'pointer', letterSpacing:'0.03em', marginTop:8 },
-  err:   { color:'#b91c1c', fontSize:'0.75rem', fontFamily:'Georgia,serif', marginTop:-8, marginBottom:8 },
-  errBox:{ background:'#fef2f2', border:'1px solid #fecaca', color:'#b91c1c', fontFamily:'Georgia,serif', fontSize:'0.8rem', padding:'10px 12px', marginBottom:'1rem' },
-  foot:  { textAlign:'center', fontFamily:'Georgia,serif', fontSize:'0.82rem', color:'#146b42', marginTop:'1.25rem' },
-  link:  { color:'#146b42', fontWeight:'bold', textDecoration:'none' },
+  input: { width:'100%', padding:'10px 12px 10px 38px', border:'1px solid #dcd8c9', fontFamily:'var(--font-marca)', fontSize:'0.85rem', color:'#0f3c27', outline:'none', background:'#fbfaf6', boxSizing:'border-box' },
+  icon:  { position:'absolute', left:11, top:'50%', transform:'translateY(-50%)', color:'#9dbfa9', pointerEvents:'none' },
+  btn:   { width:'100%', padding:'12px', background:'#0f3c27', color:'#f6f3eb', fontFamily:'var(--font-marca)', fontSize:'0.88rem', fontWeight:'bold', border:'none', cursor:'pointer', letterSpacing:'0.03em', marginTop:8 },
+  err:   { color:'#b91c1c', fontSize:'0.75rem', fontFamily:'var(--font-marca)', marginTop:-8, marginBottom:8 },
+  errBox:{ background:'#fef2f2', border:'1px solid #fecaca', color:'#b91c1c', fontFamily:'var(--font-marca)', fontSize:'0.8rem', padding:'10px 12px', marginBottom:'1rem' },
+  foot:  { textAlign:'center', fontFamily:'var(--font-marca)', fontSize:'0.82rem', color:'#2f6549', marginTop:'1.25rem' },
+  link:  { color:'#2f6549', fontWeight:'bold', textDecoration:'none' },
 };
 
 const Exito = ({ email }) => (
   <div style={C.page}>
     <div style={{...C.card, textAlign:'center'}}>
-      <div style={{width:70, height:70, background:'#eefaf4', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 1.5rem'}}>
-        <CheckCircle size={36} color="#146b42" />
+      <div style={{width:70, height:70, background:'#f1f6f2', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 1.5rem'}}>
+        <CheckCircle size={36} color="#2f6549" />
       </div>
-      <h2 style={{fontFamily:'Georgia,serif', fontSize:'1.4rem', fontWeight:'bold', color:'#052a1c', marginBottom:12}}>
+      <h2 style={{fontFamily:'var(--font-marca)', fontSize:'1.4rem', fontWeight:'bold', color:'#0f3c27', marginBottom:12}}>
         Registro exitoso
       </h2>
-      <p style={{fontFamily:'Georgia,serif', fontSize:'0.88rem', color:'#146b42', lineHeight:1.7, marginBottom:8}}>
+      <p style={{fontFamily:'var(--font-marca)', fontSize:'0.88rem', color:'#2f6549', lineHeight:1.7, marginBottom:8}}>
         Enviamos un correo de verificacion a
       </p>
-      <p style={{fontFamily:'Georgia,serif', fontSize:'0.9rem', fontWeight:'bold', color:'#052a1c', marginBottom:16}}>
+      <p style={{fontFamily:'var(--font-marca)', fontSize:'0.9rem', fontWeight:'bold', color:'#0f3c27', marginBottom:16}}>
         {email}
       </p>
-      <p style={{fontFamily:'Georgia,serif', fontSize:'0.82rem', color:'#6ec194', marginBottom:24}}>
+      <p style={{fontFamily:'var(--font-marca)', fontSize:'0.82rem', color:'#9dbfa9', marginBottom:24}}>
         Haz clic en el enlace del correo para activar tu cuenta. Revisa tu carpeta de spam si no lo encuentras.
       </p>
       <Link to="/login" style={{...C.btn, display:'block', textDecoration:'none', textAlign:'center'}}>
@@ -83,7 +83,7 @@ export default function Registro() {
 
   if (exitoso) return <Exito email={form.email} />;
 
-  const inp = (k, err) => ({...C.input, borderColor: err ? '#fca5a5' : '#ddd6c2'});
+  const inp = (k, err) => ({...C.input, borderColor: err ? '#fca5a5' : '#dcd8c9'});
 
   return (
     <div style={C.page}>
@@ -91,17 +91,17 @@ export default function Registro() {
         {/* Logo */}
         <div style={{display:'flex', alignItems:'center', justifyContent:'center', gap:10, marginBottom:'2rem'}}>
           <Link to="/" style={{display:'flex', alignItems:'center', gap:10, textDecoration:'none'}}>
-            <div style={{width:36, height:36, background:'#e0a83e', display:'flex', alignItems:'center', justifyContent:'center'}}>
-              <span style={{fontFamily:'Georgia,serif', fontWeight:'bold', color:'#052a1c', fontStyle:'italic'}}>Y</span>
+            <div style={{width:36, height:36, background:'#c6a15b', display:'flex', alignItems:'center', justifyContent:'center'}}>
+              <span style={{fontFamily:'var(--font-marca)', fontWeight:'bold', color:'#0f3c27', fontStyle:'italic'}}>Y</span>
             </div>
-            <span style={{fontFamily:'Georgia,serif', fontSize:'1.3rem', fontWeight:'bold', color:'#052a1c'}}>Yerbateras</span>
+            <span style={{fontFamily:'var(--font-marca)', fontSize:'1.3rem', fontWeight:'bold', color:'#0f3c27'}}>Yerbateras</span>
           </Link>
         </div>
 
-        <p style={{fontFamily:'Georgia,serif', fontSize:'1.4rem', fontWeight:'bold', color:'#052a1c', textAlign:'center', marginBottom:'0.25rem'}}>
+        <p style={{fontFamily:'var(--font-marca)', fontSize:'1.4rem', fontWeight:'bold', color:'#0f3c27', textAlign:'center', marginBottom:'0.25rem'}}>
           Crear cuenta
         </p>
-        <p style={{fontFamily:'Georgia,serif', fontSize:'0.82rem', color:'#6ec194', textAlign:'center', marginBottom:'1.75rem'}}>
+        <p style={{fontFamily:'var(--font-marca)', fontSize:'0.82rem', color:'#9dbfa9', textAlign:'center', marginBottom:'1.75rem'}}>
           Registrate gratis para acceder a la tienda
         </p>
 
@@ -139,7 +139,7 @@ export default function Registro() {
           {errores.email && <p style={C.err}>{errores.email}</p>}
 
           {/* Telefono */}
-          <label style={C.label}>Celular <span style={{color:'#6ec194', fontWeight:'normal'}}>(opcional)</span></label>
+          <label style={C.label}>Celular <span style={{color:'#9dbfa9', fontWeight:'normal'}}>(opcional)</span></label>
           <div style={C.wrap}>
             <Phone size={14} style={C.icon} />
             <input type="tel" value={form.telefono} onChange={e => set('telefono', e.target.value)}
@@ -148,14 +148,14 @@ export default function Registro() {
           {errores.telefono && <p style={C.err}>{errores.telefono}</p>}
 
           {/* Contrasena */}
-          <label style={C.label}>Contrasena * <span style={{color:'#6ec194', fontWeight:'normal'}}>(min. 8 caracteres)</span></label>
+          <label style={C.label}>Contrasena * <span style={{color:'#9dbfa9', fontWeight:'normal'}}>(min. 8 caracteres)</span></label>
           <div style={C.wrap}>
             <Lock size={14} style={C.icon} />
             <input type={verPass ? 'text' : 'password'} value={form.password} onChange={e => set('password', e.target.value)}
               placeholder="Minimo 8 caracteres"
               style={{...inp('password', errores.password), paddingRight:38}} />
             <button type="button" onClick={() => setVerPass(!verPass)}
-              style={{position:'absolute', right:10, top:'50%', transform:'translateY(-50%)', background:'none', border:'none', cursor:'pointer', color:'#6ec194'}}>
+              style={{position:'absolute', right:10, top:'50%', transform:'translateY(-50%)', background:'none', border:'none', cursor:'pointer', color:'#9dbfa9'}}>
               {verPass ? <EyeOff size={14} /> : <Eye size={14} />}
             </button>
           </div>
@@ -170,7 +170,7 @@ export default function Registro() {
           </div>
           {errores.confirmar && <p style={C.err}>{errores.confirmar}</p>}
 
-          <p style={{fontFamily:'Georgia,serif', fontSize:'0.75rem', color:'#6ec194', margin:'8px 0'}}>
+          <p style={{fontFamily:'var(--font-marca)', fontSize:'0.75rem', color:'#9dbfa9', margin:'8px 0'}}>
             Al registrarte aceptas nuestros terminos de uso y politica de privacidad.
           </p>
 

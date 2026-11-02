@@ -1,102 +1,54 @@
 import { useEffect, useState } from 'react';
-import { UserCheck, UserX, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 import AdminSidebar from '../../components/admin/AdminSidebar';
 import api from '../../services/api';
-import Swal from 'sweetalert2';
 
 const S = {
-  h1:    { fontFamily:'Georgia,serif', fontSize:'1.4rem', fontWeight:'bold', color:'#052a1c', margin:0 },
-  tabla: { width:'100%', borderCollapse:'collapse', background:'white', border:'1px solid #ede8da' },
-  th:    { fontFamily:'Georgia,serif', fontSize:'0.72rem', fontWeight:'bold', color:'#146b42', letterSpacing:'0.06em', textTransform:'uppercase', padding:'10px 14px', textAlign:'left', background:'#fdfbf6', borderBottom:'1px solid #ede8da' },
-  td:    { fontFamily:'Georgia,serif', fontSize:'0.84rem', color:'#052a1c', padding:'11px 14px', borderBottom:'1px solid #F5F0E1' },
+  h1:    { fontFamily:'var(--font-marca)', fontSize:'1.4rem', fontWeight:'bold', color:'#0f3c27', margin:0 },
+  tabla: { width:'100%', borderCollapse:'collapse', background:'white', border:'1px solid #ebe7dc' },
+  th:    { fontFamily:'var(--font-marca)', fontSize:'0.72rem', fontWeight:'bold', color:'#2f6549', letterSpacing:'0.06em', textTransform:'uppercase', padding:'10px 14px', textAlign:'left', background:'#fbfaf6', borderBottom:'1px solid #ebe7dc' },
+  td:    { fontFamily:'var(--font-marca)', fontSize:'0.9rem', color:'#0f3c27', padding:'11px 14px', borderBottom:'1px solid #f6f3eb' },
 };
 
-export default function AdminUsuarios() {
-  const [usuarios, setUsuarios]   = useState([]);
-  const [cargando, setCargando]   = useState(true);
-  const [buscar, setBuscar]       = useState('');
+// Ya no existen cuentas: "clientes" son las personas que han hecho pedidos (se agrupan por correo).
+export default function AdminClientes() {
+  const [clientes, setClientes] = useState([]);
+  const [cargando, setCargando] = useState(true);
+  const [buscar, setBuscar] = useState('');
 
-  const cargar = () => {
-    setCargando(true);
-    api.get('/admin/usuarios').then(r => setUsuarios(r.data.usuarios || [])).finally(() => setCargando(false));
-  };
-  useEffect(() => { cargar(); }, []);
+  useEffect(() => { api.get('/admin/usuarios').then(r => setClientes(r.data.usuarios || [])).finally(() => setCargando(false)); }, []);
 
-  const toggle = async (u) => {
-    const accion = u.activo ? 'desactivar' : 'activar';
-    const res = await Swal.fire({
-      icon:'warning', title:`${accion.charAt(0).toUpperCase() + accion.slice(1)} usuario`,
-      text: u.nombre, showCancelButton:true,
-      confirmButtonColor:'#052a1c', confirmButtonText:'Confirmar', cancelButtonText:'Cancelar',
-    });
-    if (res.isConfirmed) { await api.patch(`/admin/usuarios/${u.id}/toggle`); cargar(); }
-  };
-
-  const filtrados = usuarios.filter(u =>
-    `${u.nombre} ${u.email}`.toLowerCase().includes(buscar.toLowerCase())
-  );
+  const filtrados = clientes.filter(c => `${c.nombre} ${c.email}`.toLowerCase().includes(buscar.toLowerCase()));
 
   return (
     <AdminSidebar>
-      <div style={{maxWidth:1100}}>
-        <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'1.5rem', flexWrap:'wrap', gap:12}}>
-          <h1 style={S.h1}>Usuarios</h1>
-          <div style={{position:'relative'}}>
-            <Search size={14} style={{position:'absolute', left:10, top:'50%', transform:'translateY(-50%)', color:'#6ec194'}} />
+      <div style={{ maxWidth: 1000 }}>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'1.5rem', flexWrap:'wrap', gap:12 }}>
+          <h1 style={S.h1}>Clientes</h1>
+          <div style={{ position:'relative' }}>
+            <Search size={14} style={{ position:'absolute', left:10, top:'50%', transform:'translateY(-50%)', color:'#9dbfa9' }} />
             <input value={buscar} onChange={e => setBuscar(e.target.value)} placeholder="Buscar..."
-              style={{fontFamily:'Georgia,serif', fontSize:'0.85rem', border:'1px solid #ddd6c2', padding:'8px 12px 8px 32px', color:'#052a1c', background:'#fdfbf6', outline:'none', width:220}} />
+              style={{ fontFamily:'var(--font-marca)', fontSize:'0.9rem', border:'1px solid #dcd8c9', padding:'8px 12px 8px 32px', color:'#0f3c27', background:'#fbfaf6', outline:'none', width:220 }} />
           </div>
         </div>
-
-        {cargando ? (
-          <div style={{display:'flex', justifyContent:'center', padding:'3rem'}}>
-            <div style={{width:28, height:28, border:'3px solid #ede8da', borderTopColor:'#146b42', borderRadius:'50%', animation:'spin 0.8s linear infinite'}} />
-            <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-          </div>
-        ) : (
+        <p style={{ fontFamily:'var(--font-marca)', fontSize:'0.9rem', color:'#2f6549', marginTop:-8, marginBottom:16 }}>
+          Personas que han comprado en la tienda. No hay cuentas ni inicio de sesión de clientes.
+        </p>
+        {cargando ? <p>Cargando...</p> : (
           <table style={S.tabla}>
-            <thead>
-              <tr>{['Usuario','Email','Telefono','Rol','Pedidos','Total gastado','Estado',''].map(h => <th key={h} style={S.th}>{h}</th>)}</tr>
-            </thead>
+            <thead><tr>{['Cliente','Correo','Celular','Pedidos','Total pagado','Último pedido'].map(h => <th key={h} style={S.th}>{h}</th>)}</tr></thead>
             <tbody>
-              {filtrados.map((u, i) => (
-                <tr key={u.id} style={{background: i % 2 === 0 ? 'white' : '#fdfbf6'}}>
-                  <td style={S.td}>
-                    <div style={{display:'flex', alignItems:'center', gap:8}}>
-                      <div style={{width:30, height:30, borderRadius:'50%', background:'#052a1c', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0}}>
-                        <span style={{color:'#e0a83e', fontFamily:'Georgia,serif', fontWeight:'bold', fontSize:'0.78rem'}}>{u.nombre?.[0]?.toUpperCase()}</span>
-                      </div>
-                      <span style={{fontWeight:'bold'}}>{u.nombre} {u.apellido}</span>
-                    </div>
-                  </td>
-                  <td style={{...S.td, color:'#6ec194', fontSize:'0.78rem'}}>{u.email || '—'}</td>
-                  <td style={{...S.td, color:'#6ec194', fontSize:'0.78rem'}}>{u.telefono || '—'}</td>
-                  <td style={S.td}>
-                    <span style={{display:'inline-block', background: u.rol === 'admin' ? '#f0dcec' : '#eefaf4', color: u.rol === 'admin' ? '#6e3163' : '#146b42', fontFamily:'Georgia,serif', fontSize:'0.72rem', fontWeight:'bold', padding:'2px 8px', borderRadius:3}}>
-                      {u.rol}
-                    </span>
-                  </td>
-                  <td style={{...S.td, textAlign:'center'}}>{u.total_pedidos}</td>
-                  <td style={S.td}><b>${Number(u.total_gastado).toLocaleString('es-CO')}</b></td>
-                  <td style={S.td}>
-                    <span style={{display:'inline-block', background: u.activo ? '#eefaf4' : '#fef2f2', color: u.activo ? '#146b42' : '#b91c1c', fontFamily:'Georgia,serif', fontSize:'0.72rem', fontWeight:'bold', padding:'2px 8px', borderRadius:3}}>
-                      {u.activo ? 'Activo' : 'Inactivo'}
-                    </span>
-                  </td>
-                  <td style={S.td}>
-                    {u.rol !== 'admin' && (
-                      <button onClick={() => toggle(u)}
-                        style={{background:'none', border:'none', cursor:'pointer', color: u.activo ? '#b91c1c' : '#146b42', padding:4}}
-                        title={u.activo ? 'Desactivar' : 'Activar'}>
-                        {u.activo ? <UserX size={16} /> : <UserCheck size={16} />}
-                      </button>
-                    )}
-                  </td>
+              {filtrados.map(c => (
+                <tr key={c.email}>
+                  <td style={S.td}><b>{c.nombre}</b></td>
+                  <td style={S.td}>{c.email}</td>
+                  <td style={S.td}>{c.telefono || '—'}</td>
+                  <td style={{ ...S.td, textAlign:'center' }}>{c.total_pedidos}</td>
+                  <td style={S.td}><b>${Number(c.total_gastado).toLocaleString('es-CO')}</b></td>
+                  <td style={S.td}>{c.ultimo_pedido ? new Date(c.ultimo_pedido).toLocaleDateString('es-CO') : '—'}</td>
                 </tr>
               ))}
-              {filtrados.length === 0 && (
-                <tr><td colSpan={8} style={{...S.td, textAlign:'center', color:'#6ec194', padding:'2rem'}}>No se encontraron usuarios</td></tr>
-              )}
+              {filtrados.length === 0 && <tr><td colSpan={6} style={{ ...S.td, textAlign:'center', color:'#9dbfa9', padding:'2rem' }}>Aún no hay clientes</td></tr>}
             </tbody>
           </table>
         )}

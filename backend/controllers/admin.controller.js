@@ -12,7 +12,7 @@ const getDashboard = async (req, res) => {
         COUNT(*) FILTER(WHERE estado='entregado') AS entregados,
         COUNT(*) AS total
         FROM pedidos`),
-      pool.query(`SELECT COUNT(*) AS total FROM usuarios WHERE rol_id = 2`),
+      pool.query(`SELECT COUNT(DISTINCT LOWER(email_cliente)) AS total FROM pedidos WHERE email_cliente IS NOT NULL`),
       pool.query(`SELECT COUNT(*) AS total, COUNT(*) FILTER(WHERE stock <= stock_minimo) AS bajo_stock FROM productos WHERE activo = TRUE`),
       pool.query(`
         SELECT DATE_TRUNC('day', creado_en) AS dia,
@@ -72,7 +72,9 @@ const getPedidos = async (req, res) => {
     params.push(limit, offset);
     const { rows } = await pool.query(
       `SELECT p.id, p.numero_pedido, p.total, p.estado, p.creado_en,
-              u.nombre AS cliente, u.email
+              COALESCE(p.nombre_cliente, u.nombre) AS cliente, COALESCE(p.email_cliente, u.email) AS email,
+              COALESCE(p.telefono_cliente, u.telefono) AS telefono, p.direccion_envio, p.ciudad_envio, p.departamento_envio,
+              p.notas_cliente, p.notas_admin
        FROM pedidos p
        LEFT JOIN usuarios u ON p.usuario_id = u.id
        ${whereClause}
@@ -106,24 +108,25 @@ const cambiarEstadoPedido = async (req, res) => {
   }
 };
 
-// ─── USUARIOS: listar clientes ────────────────────────────
+// ─── CLIENTES: quienes han hecho pedidos (ya no hay cuentas de cliente) ───
 const getUsuarios = async (req, res) => {
   try {
     const { rows } = await pool.query(
-      `SELECT u.id, u.nombre, u.apellido, u.email, u.telefono,
-              u.verificado, u.activo, u.creado_en, u.ultimo_login,
-              r.nombre AS rol,
-              COUNT(p.id) AS total_pedidos,
-              COALESCE(SUM(p.total) FILTER(WHERE p.estado='pagado'), 0) AS total_gastado
-       FROM usuarios u
-       JOIN roles r ON u.rol_id = r.id
-       LEFT JOIN pedidos p ON p.usuario_id = u.id
-       GROUP BY u.id, r.nombre
-       ORDER BY u.creado_en DESC`
+      `SELECT LOWER(COALESCE(p.email_cliente, u.email)) AS email,
+              MAX(COALESCE(p.nombre_cliente, u.nombre)) AS nombre,
+              MAX(COALESCE(p.telefono_cliente, u.telefono)) AS telefono,
+              COUNT(*) AS total_pedidos,
+              COALESCE(SUM(p.total) FILTER (WHERE p.estado IN ('pagado','preparando','enviado','entregado')), 0) AS total_gastado,
+              MAX(p.creado_en) AS ultimo_pedido
+       FROM pedidos p LEFT JOIN usuarios u ON p.usuario_id = u.id
+       WHERE COALESCE(p.email_cliente, u.email) IS NOT NULL
+       GROUP BY LOWER(COALESCE(p.email_cliente, u.email))
+       ORDER BY MAX(p.creado_en) DESC`
     );
     res.json({ ok: true, usuarios: rows });
   } catch (err) {
-    res.status(500).json({ ok: false, mensaje: 'Error al obtener usuarios' });
+    console.error('Error getUsuarios:', err);
+    res.status(500).json({ ok: false, mensaje: 'Error al obtener clientes' });
   }
 };
 
@@ -345,9 +348,74 @@ const eliminarLineaCuidado = async (req, res) => {
   }
 };
 
+// ─── PRODUCTOS Y KITS (admin: incluye los desactivados) ────
+const getProductosAdmin = async (req, res) => {
+  const { tipo } = req.query; // 'kit' | 'producto' | undefined
+  const where = tipo === 'kit' ? 'WHERE p.es_kit = TRUE' : tipo === 'producto' ? 'WHERE p.es_kit = FALSE' : '';
+  try {
+    const { rows } = await pool.query(
+      `SELECT p.id, p.nombre, p.descripcion, p.descripcion_corta, p.precio, p.precio_descuento, p.stock, p.stock_minimo,
+              p.categoria_id, p.presentacion, p.principio_activo, p.indicaciones, p.imagen_principal,
+              p.destacado, p.activo, p.es_kit, p.contenido_kit, p.temporada, c.nombre AS categoria
+       FROM productos p LEFT JOIN categorias c ON p.categoria_id = c.id
+       ${where} ORDER BY p.activo DESC, p.es_kit DESC, p.nombre`
+    );
+    res.json({ ok: true, productos: rows });
+  } catch (err) {
+    console.error('Error getProductosAdmin:', err);
+    res.status(500).json({ ok: false, mensaje: 'Error al obtener productos' });
+  }
+};
+
+const toggleProducto = async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      'UPDATE productos SET activo = NOT activo WHERE id = $1 RETURNING id, activo', [req.params.id]
+    );
+    if (!rows[0]) return res.status(404).json({ ok: false, mensaje: 'Producto no encontrado' });
+    res.json({ ok: true, producto: rows[0] });
+  } catch (err) {
+    console.error('Error toggleProducto:', err);
+    res.status(500).json({ ok: false, mensaje: 'Error al actualizar el producto' });
+  }
+};
+
+// ─── DESTACADOS Y PROMOCIONES ─────────────────────────────
+const toggleDestacado = async (req, res) => {
+  try {
+    const { rows } = await pool.query('UPDATE productos SET destacado = NOT destacado WHERE id = $1 RETURNING id, destacado', [req.params.id]);
+    if (!rows[0]) return res.status(404).json({ ok: false, mensaje: 'Producto no encontrado' });
+    res.json({ ok: true, producto: rows[0] });
+  } catch (err) {
+    console.error('Error toggleDestacado:', err);
+    res.status(500).json({ ok: false, mensaje: 'Error al actualizar el producto' });
+  }
+};
+
+// body: { porcentaje: 1..90 }  -> pone precio_descuento ;  { porcentaje: null/0 } -> quita la promocion
+const fijarPromocion = async (req, res) => {
+  const pct = req.body.porcentaje === null || req.body.porcentaje === '' ? 0 : Number(req.body.porcentaje);
+  if (!Number.isFinite(pct) || pct < 0 || pct > 90) {
+    return res.status(400).json({ ok: false, mensaje: 'El descuento debe estar entre 1% y 90%' });
+  }
+  try {
+    const { rows } = await pool.query(
+      `UPDATE productos SET precio_descuento = CASE WHEN $1::numeric > 0 THEN ROUND(precio * (1 - $1::numeric / 100)) ELSE NULL END
+       WHERE id = $2 RETURNING id, precio, precio_descuento`,
+      [pct, req.params.id]
+    );
+    if (!rows[0]) return res.status(404).json({ ok: false, mensaje: 'Producto no encontrado' });
+    res.json({ ok: true, producto: rows[0] });
+  } catch (err) {
+    console.error('Error fijarPromocion:', err);
+    res.status(500).json({ ok: false, mensaje: 'Error al actualizar la promoción' });
+  }
+};
+
 module.exports = {
   getDashboard, getInventario, getPedidos, cambiarEstadoPedido,
   getUsuarios, toggleUsuario, ajustarStock, getConfiguracion, actualizarConfiguracion,
   getCategorias, crearCategoria, actualizarCategoria, eliminarCategoria,
   getLineasCuidado, crearLineaCuidado, actualizarLineaCuidado, eliminarLineaCuidado,
+  getProductosAdmin, toggleProducto, toggleDestacado, fijarPromocion,
 };

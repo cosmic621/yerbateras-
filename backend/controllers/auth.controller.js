@@ -253,4 +253,37 @@ const obtenerPerfil = async (req, res) => {
   }
 };
 
-module.exports = { registrar, verificarEmail, login, loginGoogle, enviarOtp, verificarOtp, obtenerPerfil };
+// ─── LOGIN de ADMINISTRADOR (se usa solo desde /admin) ─────
+// Mismo mensaje de error para "no existe", "clave mala" y "no es admin",
+// para no revelar que cuentas son de administrador.
+const loginAdmin = async (req, res) => {
+  const { email, password } = req.body;
+  const fallo = () => {
+    res.locals.falloLogin?.();
+    return res.status(401).json({ ok: false, mensaje: 'Credenciales inválidas' });
+  };
+  try {
+    const { rows } = await pool.query(
+      `SELECT u.*, r.nombre AS rol FROM usuarios u
+       JOIN roles r ON u.rol_id = r.id
+       WHERE u.email = $1 AND u.activo = TRUE`,
+      [String(email).trim()]
+    );
+    const usuario = rows[0];
+    if (!usuario || usuario.rol !== 'admin' || !usuario.password_hash) return fallo();
+    if (!(await bcrypt.compare(password, usuario.password_hash))) return fallo();
+
+    res.locals.exitoLogin?.();
+    await pool.query('UPDATE usuarios SET ultimo_login = NOW() WHERE id = $1', [usuario.id]);
+    res.json({
+      ok: true,
+      token: generarToken(usuario),
+      usuario: { id: usuario.id, nombre: usuario.nombre, email: usuario.email, rol: usuario.rol, avatar_url: usuario.avatar_url },
+    });
+  } catch (err) {
+    console.error('ERROR LOGIN ADMIN:', err);
+    res.status(500).json({ ok: false, mensaje: 'Error al iniciar sesión' });
+  }
+};
+
+module.exports = { registrar, verificarEmail, login, loginGoogle, enviarOtp, verificarOtp, obtenerPerfil, loginAdmin };

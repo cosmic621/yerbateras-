@@ -21,7 +21,7 @@ export default function AdminResenas() {
       Swal.fire({ icon: 'success', title: 'Reseña publicada', timer: 1400, showConfirmButton: false, toast: true, position: 'top-end' });
       cargar();
     } catch (err) {
-      Swal.fire({ icon: 'error', title: 'Error', text: err.response?.data?.mensaje, confirmButtonColor: '#052a1c' });
+      Swal.fire({ icon: 'error', title: 'Error', text: err.response?.data?.mensaje, confirmButtonColor: '#0f3c27' });
     }
   };
 
@@ -35,7 +35,7 @@ export default function AdminResenas() {
       await api.delete(`/admin/resenas/${r.id}`);
       cargar();
     } catch (err) {
-      Swal.fire({ icon: 'error', title: 'Error', text: err.response?.data?.mensaje, confirmButtonColor: '#052a1c' });
+      Swal.fire({ icon: 'error', title: 'Error', text: err.response?.data?.mensaje, confirmButtonColor: '#0f3c27' });
     }
   };
 
@@ -75,7 +75,7 @@ export default function AdminResenas() {
                         <Star key={i} size={12} className={i < r.calificacion ? 'text-dorado-500 fill-dorado-500' : 'text-gray-200 fill-gray-200'} />
                       ))}
                     </div>
-                    <span className="text-xs font-body font-bold px-2 py-0.5 rounded" style={{ background: r.aprobada ? '#eefaf4' : '#fef9e7', color: r.aprobada ? '#0f5535' : '#b8860b' }}>
+                    <span className="text-xs font-body font-bold px-2 py-0.5 rounded" style={{ background: r.aprobada ? '#f1f6f2' : '#fef9e7', color: r.aprobada ? '#214f39' : '#b8860b' }}>
                       {r.aprobada ? 'Publicada' : 'Pendiente'}
                     </span>
                   </div>
@@ -85,7 +85,7 @@ export default function AdminResenas() {
                 </div>
                 <div className="flex gap-2 shrink-0">
                   {!r.aprobada && (
-                    <button onClick={() => aprobar(r)} className="text-xs font-body px-3 py-1.5 text-white flex items-center gap-1" style={{ background: '#146b42' }}>
+                    <button onClick={() => aprobar(r)} className="text-xs font-body px-3 py-1.5 text-white flex items-center gap-1" style={{ background: '#2f6549' }}>
                       <Check size={12} /> Aprobar
                     </button>
                   )}

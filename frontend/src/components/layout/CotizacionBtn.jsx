@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Briefcase, X, CheckCircle, Building2, User, Mail, Phone, Package, Hash, MessageSquare } from 'lucide-react';
 import api from '../../services/api';
 
@@ -10,6 +10,13 @@ export default function CotizacionBtn() {
   const [enviando, setEnviando] = useState(false);
   const [enviado, setEnviado] = useState(false);
   const [error, setError] = useState('');
+
+  // El menú "Servicios → Empresas y grupos" abre este mismo formulario
+  useEffect(() => {
+    const abrir = () => setAbierto(true);
+    window.addEventListener('abrir-cotizacion', abrir);
+    return () => window.removeEventListener('abrir-cotizacion', abrir);
+  }, []);
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
@@ -40,34 +47,16 @@ export default function CotizacionBtn() {
   };
 
   const inputStyle = {
-    width: '100%', padding: '9px 12px 9px 36px', border: '1px solid #ddd6c2',
-    fontFamily: 'Georgia,serif', fontSize: '0.85rem', color: '#052a1c',
-    background: '#fdfbf6', outline: 'none', boxSizing: 'border-box',
+    width: '100%', padding: '9px 12px 9px 36px', border: '1px solid #dcd8c9',
+    fontFamily: 'var(--font-marca)', fontSize: '0.85rem', color: '#0f3c27',
+    background: '#fbfaf6', outline: 'none', boxSizing: 'border-box',
   };
-  const iconStyle = { position: 'absolute', left: 11, top: '50%', transform: 'translateY(-50%)', color: '#6ec194' };
-  const labelStyle = { display: 'block', fontFamily: 'Georgia,serif', fontSize: '0.78rem', fontWeight: 'bold', color: '#0a3d28', marginBottom: 4, marginTop: 12 };
+  const iconStyle = { position: 'absolute', left: 11, top: '50%', transform: 'translateY(-50%)', color: '#9dbfa9' };
+  const labelStyle = { display: 'block', fontFamily: 'var(--font-marca)', fontSize: '0.78rem', fontWeight: 'bold', color: '#16422e', marginBottom: 4, marginTop: 12 };
 
   return (
     <>
-      {!abierto && (
-        <button
-          onClick={() => setAbierto(true)}
-          aria-label="Solicitar cotización para organizaciones"
-          style={{
-            position: 'fixed', bottom: '1.5rem', left: '1.5rem', zIndex: 50,
-            display: 'flex', alignItems: 'center', gap: 8,
-            background: '#e0a83e', color: '#052a1c', border: 'none',
-            padding: '11px 18px', borderRadius: 999,
-            fontFamily: 'Georgia,serif', fontWeight: 'bold', fontSize: '0.82rem',
-            boxShadow: '0 4px 16px rgba(224,168,62,0.5)', cursor: 'pointer',
-            transition: 'transform 0.2s ease',
-          }}
-          onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
-          onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
-        >
-          <Briefcase size={16} /> Cotización para empresas
-        </button>
-      )}
+      {/* Sin botón flotante: se abre desde el menú Servicios, el pie de página y Contacto */}
 
       {abierto && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-start', padding: '1.5rem' }}>
@@ -76,30 +65,30 @@ export default function CotizacionBtn() {
             position: 'relative', width: 380, maxWidth: '100%', maxHeight: '85vh', overflowY: 'auto',
             background: 'white', boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
           }}>
-            <div style={{ background: '#052a1c', padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ background: '#0f3c27', padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <Briefcase size={18} color="#e0a83e" />
-                <p style={{ fontFamily: 'Georgia,serif', fontWeight: 'bold', color: '#F5F0E1', margin: 0 }}>Cotización para tu organización</p>
+                <Briefcase size={18} color="#c6a15b" />
+                <p style={{ fontFamily: 'var(--font-marca)', fontWeight: 'bold', color: '#f6f3eb', margin: 0 }}>Cotización para tu organización</p>
               </div>
-              <button onClick={cerrar} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6ec194' }}><X size={18} /></button>
+              <button onClick={cerrar} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9dbfa9' }}><X size={18} /></button>
             </div>
 
             <div style={{ padding: '20px' }}>
               {enviado ? (
                 <div style={{ textAlign: 'center', padding: '1.5rem 0' }}>
-                  <CheckCircle size={44} color="#146b42" style={{ margin: '0 auto 14px' }} />
-                  <p style={{ fontFamily: 'Georgia,serif', fontWeight: 'bold', color: '#052a1c', marginBottom: 8 }}>¡Solicitud enviada!</p>
-                  <p style={{ fontFamily: 'Georgia,serif', fontSize: '0.85rem', color: '#146b42' }}>
+                  <CheckCircle size={44} color="#2f6549" style={{ margin: '0 auto 14px' }} />
+                  <p style={{ fontFamily: 'var(--font-marca)', fontWeight: 'bold', color: '#0f3c27', marginBottom: 8 }}>¡Solicitud enviada!</p>
+                  <p style={{ fontFamily: 'var(--font-marca)', fontSize: '0.85rem', color: '#2f6549' }}>
                     Te contactaremos pronto para armar tu cotización.
                   </p>
                 </div>
               ) : (
                 <form onSubmit={enviar} noValidate>
-                  <p style={{ fontFamily: 'Georgia,serif', fontSize: '0.8rem', color: '#146b42', marginBottom: 8 }}>
-                    Cuéntanos qué necesita tu organización (kits corporativos, regalos empresariales, eventos) y te armamos una cotización a la medida.
+                  <p style={{ fontFamily: 'var(--font-marca)', fontSize: '0.8rem', color: '#2f6549', marginBottom: 8 }}>
+                    Cuéntanos qué necesita tu organización (kits corporativos, regalos empresariales, talleres para tu equipo, eventos) y te armamos una cotización a la medida.
                   </p>
                   {error && (
-                    <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c', fontFamily: 'Georgia,serif', fontSize: '0.78rem', padding: '8px 12px', marginTop: 10 }}>
+                    <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c', fontFamily: 'var(--font-marca)', fontSize: '0.78rem', padding: '8px 12px', marginTop: 10 }}>
                       {error}
                     </div>
                   )}
@@ -131,10 +120,17 @@ export default function CotizacionBtn() {
                   <label style={labelStyle}>¿Qué te interesa?</label>
                   <div style={{ position: 'relative' }}>
                     <Package size={14} style={iconStyle} />
-                    <input value={form.interes} onChange={e => set('interes', e.target.value)} placeholder="Ej: kits de regalo para empleados" style={inputStyle} />
+                    <select value={form.interes} onChange={e => set('interes', e.target.value)} style={{ ...inputStyle, cursor: 'pointer' }}>
+                      <option value="">Selecciona una opción</option>
+                      <option value="Kits corporativos / regalos empresariales">Kits corporativos / regalos empresariales</option>
+                      <option value="Talleres para mi empresa o grupo">Talleres para mi empresa o grupo</option>
+                      <option value="Masajes / jornada de bienestar para el equipo">Masajes / jornada de bienestar para el equipo</option>
+                      <option value="Eventos">Eventos</option>
+                      <option value="Otro">Otro</option>
+                    </select>
                   </div>
 
-                  <label style={labelStyle}>Cantidad estimada</label>
+                  <label style={labelStyle}>Cantidad estimada (kits o personas)</label>
                   <div style={{ position: 'relative' }}>
                     <Hash size={14} style={iconStyle} />
                     <input type="number" min="1" value={form.cantidad_estimada} onChange={e => set('cantidad_estimada', e.target.value)} placeholder="Ej: 50" style={inputStyle} />
@@ -143,13 +139,13 @@ export default function CotizacionBtn() {
                   <label style={labelStyle}>Mensaje (opcional)</label>
                   <div style={{ position: 'relative' }}>
                     <MessageSquare size={14} style={{ ...iconStyle, top: 16 }} />
-                    <textarea value={form.mensaje} onChange={e => set('mensaje', e.target.value)} placeholder="Detalles adicionales..." rows={3} style={{ ...inputStyle, paddingTop: 9, resize: 'vertical' }} />
+                    <textarea value={form.mensaje} onChange={e => set('mensaje', e.target.value)} placeholder="Fecha tentativa, número de personas, temática del taller..." rows={3} style={{ ...inputStyle, paddingTop: 9, resize: 'vertical' }} />
                   </div>
 
                   <button type="submit" disabled={enviando}
                     style={{
-                      width: '100%', marginTop: 18, padding: '11px', background: '#052a1c', color: '#F5F0E1',
-                      border: 'none', fontFamily: 'Georgia,serif', fontWeight: 'bold', fontSize: '0.85rem',
+                      width: '100%', marginTop: 18, padding: '11px', background: '#0f3c27', color: '#f6f3eb',
+                      border: 'none', fontFamily: 'var(--font-marca)', fontWeight: 'bold', fontSize: '0.85rem',
                       cursor: 'pointer', opacity: enviando ? 0.6 : 1,
                     }}>
                     {enviando ? 'Enviando...' : 'Solicitar cotización'}

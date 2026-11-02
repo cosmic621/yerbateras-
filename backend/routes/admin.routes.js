@@ -7,6 +7,11 @@ const resenasC = require('../controllers/resenas.controller');
 const newsletterC = require('../controllers/newsletter.controller');
 const cotizacionesC = require('../controllers/cotizaciones.controller');
 const botiquinC = require('../controllers/botiquin.controller');
+const sitioC = require('../controllers/sitio.controller');
+const eventosC = require('../controllers/eventos.controller');
+const talleresC = require('../controllers/talleres.controller');
+const { upload } = require('../config/upload');
+const bannersC = require('../controllers/banners.controller');
 
 const router = express.Router();
 router.use(verificarToken, soloAdmin);
@@ -53,4 +58,38 @@ router.post('/botiquin/respuestas', botiquinC.crearRespuesta);
 router.put('/botiquin/respuestas/:id', botiquinC.actualizarRespuesta);
 router.delete('/botiquin/respuestas/:id', botiquinC.eliminarRespuesta);
 router.put('/botiquin/respuestas/:id/productos', botiquinC.asociarProductos);
+
+// Productos y kits (incluye desactivados) + activar/desactivar
+router.get('/productos', c.getProductosAdmin);
+router.patch('/productos/:id/toggle', c.toggleProducto);
+router.patch('/productos/:id/destacado', c.toggleDestacado);
+router.patch('/productos/:id/promocion', c.fijarPromocion);
+
+// Carrusel de la pagina principal (imagen = campo "imagen")
+router.get('/banners', bannersC.listarBannersAdmin);
+router.post('/banners', upload.single('imagen'), bannersC.crearBanner);
+router.put('/banners/:id', upload.single('imagen'), bannersC.actualizarBanner);
+router.delete('/banners/:id', bannersC.eliminarBanner);
+
+// Secciones y temporadas
+router.get('/secciones', sitioC.listarSeccionesAdmin);
+router.post('/secciones', sitioC.crearTemporada);
+router.patch('/secciones/:clave', sitioC.actualizarSeccion);
+router.delete('/secciones/:clave', sitioC.eliminarTemporada);
+
+// Eventos (flyer = campo "flyer")
+router.get('/eventos', eventosC.listarEventosAdmin);
+router.post('/eventos', upload.single('flyer'), eventosC.crearEvento);
+router.put('/eventos/:id', upload.single('flyer'), eventosC.actualizarEvento);
+router.delete('/eventos/:id', eventosC.eliminarEvento);
+
+// Talleres e inscripciones
+router.get('/talleres', talleresC.listarTalleresAdmin);
+router.post('/talleres', upload.single('flyer'), talleresC.crearTaller);
+router.put('/talleres/:id', upload.single('flyer'), talleresC.actualizarTaller);
+router.delete('/talleres/:id', talleresC.eliminarTaller);
+router.get('/talleres/:id/inscripciones', talleresC.listarInscripciones);
+router.post('/talleres/inscripciones/:id/pago-manual', talleresC.registrarPagoManual);
+router.patch('/talleres/inscripciones/:id/cancelar', talleresC.cancelarInscripcion);
+
 module.exports = router;

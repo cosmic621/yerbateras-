@@ -9,8 +9,8 @@ const ESTADOS = {
   pendiente_pago: { label: 'Pago pendiente', color: 'bg-yellow-100 text-yellow-700' },
 };
 
-const hoyISO = () => new Date().toISOString().slice(0, 10);
-const maxFechaISO = () => { const d = new Date(); d.setDate(d.getDate() + 30); return d.toISOString().slice(0, 10); };
+const hoyISO = () => new Date().toLocaleDateString('en-CA', { timeZone: 'America/Bogota' });
+const maxFechaISO = () => { const d = new Date(Date.now() + 30 * 864e5); return d.toLocaleDateString('en-CA', { timeZone: 'America/Bogota' }); };
 
 function ModalReprogramar({ cita, onClose, onGuardado }) {
   const [fecha, setFecha] = useState(cita.fecha.slice(0, 10));
@@ -36,7 +36,7 @@ function ModalReprogramar({ cita, onClose, onGuardado }) {
       Swal.fire({ icon: 'success', title: 'Cita reprogramada', timer: 1500, showConfirmButton: false, toast: true, position: 'top-end' });
       onGuardado();
     } catch (err) {
-      Swal.fire({ icon: 'error', title: 'No se pudo reprogramar', text: err.response?.data?.mensaje || 'Intenta de nuevo', confirmButtonColor: '#052a1c' });
+      Swal.fire({ icon: 'error', title: 'No se pudo reprogramar', text: err.response?.data?.mensaje || 'Intenta de nuevo', confirmButtonColor: '#0f3c27' });
     } finally { setGuardando(false); }
   };
 
@@ -48,6 +48,9 @@ function ModalReprogramar({ cita, onClose, onGuardado }) {
           <button onClick={onClose}><X size={20} className="text-gray-400" /></button>
         </div>
 
+        <p className="text-xs font-body bg-dorado-50 border border-dorado-200 text-verde-800 p-2.5 mb-4 leading-relaxed">
+          Reprogramar no genera devolución de dinero y solo es posible con mínimo 24 horas de anticipación.
+        </p>
         <label className="block text-sm font-body font-semibold text-gray-700 mb-1.5">Nueva fecha</label>
         <input type="date" value={fecha} min={hoyISO()} max={maxFechaISO()}
           onChange={e => setFecha(e.target.value)} className="input-field mb-4" />
@@ -101,6 +104,10 @@ export default function MisCitas() {
           <Calendar size={28} className="text-dorado-500" /> Mis Citas
         </h1>
 
+        <div className="bg-dorado-50 border border-dorado-200 text-verde-800 text-sm font-body p-4 mb-6 leading-relaxed">
+          <b>Política de cancelación:</b> las citas solo se pueden cancelar o reprogramar con mínimo 24 horas de anticipación. La cancelación se maneja como reprogramación: no hay devolución de dinero.
+        </div>
+
         {citas.length === 0 ? (
           <div className="bg-white p-12 text-center shadow-sm border border-gray-100">
             <Leaf size={48} className="text-verde-200 mx-auto mb-4" />
@@ -125,7 +132,10 @@ export default function MisCitas() {
                       <Clock3 size={13} /> {c.hora_inicio.slice(0,5)} - {c.hora_fin.slice(0,5)}
                     </p>
                   </div>
-                  {c.estado === 'confirmada' && (
+                  {c.estado === 'confirmada' && !c.puede_reprogramar && (
+                    <span className="text-xs font-body text-gray-500 max-w-[14rem]">Faltan menos de 24 horas: ya no se puede reprogramar.</span>
+                  )}
+                  {c.estado === 'confirmada' && c.puede_reprogramar && (
                     <button onClick={() => setEditando(c)} className="btn-outline flex items-center gap-2 text-sm">
                       <Pencil size={14} /> Reprogramar
                     </button>

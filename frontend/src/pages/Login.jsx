@@ -6,26 +6,26 @@ import { useAuth } from '../context/AuthContext';
 import Swal from 'sweetalert2';
 
 const C = {
-  page:   { minHeight:'100vh', background:'#052a1c', display:'flex', alignItems:'center', justifyContent:'center', padding:'2rem 1rem' },
+  page:   { minHeight:'100vh', background:'#0f3c27', display:'flex', alignItems:'center', justifyContent:'center', padding:'2rem 1rem' },
   card:   { width:'100%', maxWidth:420, background:'white', padding:'2.5rem', boxShadow:'0 20px 60px rgba(0,0,0,0.3)' },
   logo:   { display:'flex', alignItems:'center', justifyContent:'center', gap:10, marginBottom:'2rem' },
-  logoBox:{ width:36, height:36, background:'#e0a83e', display:'flex', alignItems:'center', justifyContent:'center' },
-  title:  { fontFamily:'Georgia,serif', fontSize:'1.5rem', fontWeight:'bold', color:'#052a1c', textAlign:'center', marginBottom:'0.25rem' },
-  sub:    { fontFamily:'Georgia,serif', fontSize:'0.82rem', color:'#6ec194', textAlign:'center', marginBottom:'1.75rem' },
-  tabs:   { display:'flex', border:'1px solid #ddd6c2', marginBottom:'1.5rem', overflow:'hidden' },
-  tabA:   { flex:1, padding:'10px', fontFamily:'Georgia,serif', fontSize:'0.82rem', fontWeight:'bold', border:'none', cursor:'pointer', transition:'all 0.2s' },
-  label:  { display:'block', fontFamily:'Georgia,serif', fontSize:'0.8rem', fontWeight:'bold', color:'#0a3d28', marginBottom:6 },
+  logoBox:{ width:36, height:36, background:'#c6a15b', display:'flex', alignItems:'center', justifyContent:'center' },
+  title:  { fontFamily:'var(--font-marca)', fontSize:'1.5rem', fontWeight:'bold', color:'#0f3c27', textAlign:'center', marginBottom:'0.25rem' },
+  sub:    { fontFamily:'var(--font-marca)', fontSize:'0.82rem', color:'#9dbfa9', textAlign:'center', marginBottom:'1.75rem' },
+  tabs:   { display:'flex', border:'1px solid #dcd8c9', marginBottom:'1.5rem', overflow:'hidden' },
+  tabA:   { flex:1, padding:'10px', fontFamily:'var(--font-marca)', fontSize:'0.82rem', fontWeight:'bold', border:'none', cursor:'pointer', transition:'all 0.2s' },
+  label:  { display:'block', fontFamily:'var(--font-marca)', fontSize:'0.8rem', fontWeight:'bold', color:'#16422e', marginBottom:6 },
   wrap:   { position:'relative', marginBottom:'1rem' },
-  input:  { width:'100%', padding:'10px 12px 10px 38px', border:'1px solid #ddd6c2', fontFamily:'Georgia,serif', fontSize:'0.85rem', color:'#052a1c', outline:'none', background:'#fdfbf6', boxSizing:'border-box' },
-  icon:   { position:'absolute', left:11, top:'50%', transform:'translateY(-50%)', color:'#6ec194', pointerEvents:'none' },
-  btn:    { width:'100%', padding:'12px', background:'#052a1c', color:'#F5F0E1', fontFamily:'Georgia,serif', fontSize:'0.88rem', fontWeight:'bold', border:'none', cursor:'pointer', letterSpacing:'0.03em', marginTop:4 },
-  btnG:   { width:'100%', padding:'12px', background:'#e0a83e', color:'#052a1c', fontFamily:'Georgia,serif', fontSize:'0.88rem', fontWeight:'bold', border:'none', cursor:'pointer', letterSpacing:'0.03em', marginTop:4 },
-  err:    { background:'#fef2f2', border:'1px solid #fecaca', color:'#b91c1c', fontFamily:'Georgia,serif', fontSize:'0.8rem', padding:'10px 12px', marginBottom:'1rem' },
+  input:  { width:'100%', padding:'10px 12px 10px 38px', border:'1px solid #dcd8c9', fontFamily:'var(--font-marca)', fontSize:'0.85rem', color:'#0f3c27', outline:'none', background:'#fbfaf6', boxSizing:'border-box' },
+  icon:   { position:'absolute', left:11, top:'50%', transform:'translateY(-50%)', color:'#9dbfa9', pointerEvents:'none' },
+  btn:    { width:'100%', padding:'12px', background:'#0f3c27', color:'#f6f3eb', fontFamily:'var(--font-marca)', fontSize:'0.88rem', fontWeight:'bold', border:'none', cursor:'pointer', letterSpacing:'0.03em', marginTop:4 },
+  btnG:   { width:'100%', padding:'12px', background:'#c6a15b', color:'#0f3c27', fontFamily:'var(--font-marca)', fontSize:'0.88rem', fontWeight:'bold', border:'none', cursor:'pointer', letterSpacing:'0.03em', marginTop:4 },
+  err:    { background:'#fef2f2', border:'1px solid #fecaca', color:'#b91c1c', fontFamily:'var(--font-marca)', fontSize:'0.8rem', padding:'10px 12px', marginBottom:'1rem' },
   div:    { display:'flex', alignItems:'center', gap:10, margin:'1.2rem 0' },
-  divL:   { flex:1, height:1, background:'#ddd6c2' },
-  divT:   { fontFamily:'Georgia,serif', fontSize:'0.75rem', color:'#6ec194', whiteSpace:'nowrap' },
-  foot:   { textAlign:'center', fontFamily:'Georgia,serif', fontSize:'0.82rem', color:'#146b42', marginTop:'1.25rem' },
-  link:   { color:'#146b42', fontWeight:'bold', textDecoration:'none' },
+  divL:   { flex:1, height:1, background:'#dcd8c9' },
+  divT:   { fontFamily:'var(--font-marca)', fontSize:'0.75rem', color:'#9dbfa9', whiteSpace:'nowrap' },
+  foot:   { textAlign:'center', fontFamily:'var(--font-marca)', fontSize:'0.82rem', color:'#2f6549', marginTop:'1.25rem' },
+  link:   { color:'#2f6549', fontWeight:'bold', textDecoration:'none' },
 };
 
 export default function Login() {
@@ -60,7 +60,7 @@ export default function Login() {
     } catch (err) {
       const msg = err.response?.data?.mensaje || 'Credenciales invalidas';
       if (err.response?.data?.requiere_verificacion) {
-        Swal.fire({ icon:'warning', title:'Cuenta sin verificar', text:'Revisa tu correo y haz clic en el enlace de verificacion.', confirmButtonColor:'#052a1c' });
+        Swal.fire({ icon:'warning', title:'Cuenta sin verificar', text:'Revisa tu correo y haz clic en el enlace de verificacion.', confirmButtonColor:'#0f3c27' });
       } else {
         setErrores({ general: msg });
       }
@@ -94,7 +94,7 @@ export default function Login() {
 
   const loginGoogle = () => {
     if (typeof window.google === 'undefined') {
-      Swal.fire({ icon:'info', title:'Google no disponible', text:'Configura VITE_GOOGLE_CLIENT_ID en el .env del frontend', confirmButtonColor:'#052a1c' });
+      Swal.fire({ icon:'info', title:'Google no disponible', text:'Configura VITE_GOOGLE_CLIENT_ID en el .env del frontend', confirmButtonColor:'#0f3c27' });
       return;
     }
     window.google.accounts.id.initialize({
@@ -106,7 +106,7 @@ export default function Login() {
           login(data.token, data.usuario);
           navigate(data.usuario.rol === 'admin' ? '/admin' : '/tienda');
         } catch (err) {
-          Swal.fire({ icon:'error', title:'Error', text: err.response?.data?.mensaje, confirmButtonColor:'#052a1c' });
+          Swal.fire({ icon:'error', title:'Error', text: err.response?.data?.mensaje, confirmButtonColor:'#0f3c27' });
         } finally { setCargando(false); }
       }
     });
@@ -115,8 +115,8 @@ export default function Login() {
 
   const tabStyle = (t) => ({
     ...C.tabA,
-    background: tab === t ? '#052a1c' : 'white',
-    color:      tab === t ? '#F5F0E1' : '#146b42',
+    background: tab === t ? '#0f3c27' : 'white',
+    color:      tab === t ? '#f6f3eb' : '#2f6549',
   });
 
   return (
@@ -126,9 +126,9 @@ export default function Login() {
         <div style={C.logo}>
           <Link to="/" style={{display:'flex', alignItems:'center', gap:10, textDecoration:'none'}}>
             <div style={C.logoBox}>
-              <span style={{fontFamily:'Georgia,serif', fontWeight:'bold', color:'#052a1c', fontStyle:'italic'}}>Y</span>
+              <span style={{fontFamily:'var(--font-marca)', fontWeight:'bold', color:'#0f3c27', fontStyle:'italic'}}>Y</span>
             </div>
-            <span style={{fontFamily:'Georgia,serif', fontSize:'1.3rem', fontWeight:'bold', color:'#052a1c'}}>Yerbateras</span>
+            <span style={{fontFamily:'var(--font-marca)', fontSize:'1.3rem', fontWeight:'bold', color:'#0f3c27'}}>Yerbateras</span>
           </Link>
         </div>
 
@@ -152,9 +152,9 @@ export default function Login() {
               <div style={C.wrap}>
                 <Mail size={15} style={C.icon} />
                 <input type="email" value={form.email} onChange={e => set('email', e.target.value)}
-                  placeholder="tu@correo.com" style={{...C.input, borderColor: errores.email ? '#fca5a5' : '#ddd6c2'}} />
+                  placeholder="tu@correo.com" style={{...C.input, borderColor: errores.email ? '#fca5a5' : '#dcd8c9'}} />
               </div>
-              {errores.email && <p style={{color:'#b91c1c', fontSize:'0.75rem', fontFamily:'Georgia,serif', marginBottom:8}}>{errores.email}</p>}
+              {errores.email && <p style={{color:'#b91c1c', fontSize:'0.75rem', fontFamily:'var(--font-marca)', marginBottom:8}}>{errores.email}</p>}
             </div>
 
             <div>
@@ -163,13 +163,13 @@ export default function Login() {
                 <Lock size={15} style={C.icon} />
                 <input type={verPass ? 'text' : 'password'} value={form.password} onChange={e => set('password', e.target.value)}
                   placeholder="Tu contrasena"
-                  style={{...C.input, paddingRight:38, borderColor: errores.password ? '#fca5a5' : '#ddd6c2'}} />
+                  style={{...C.input, paddingRight:38, borderColor: errores.password ? '#fca5a5' : '#dcd8c9'}} />
                 <button type="button" onClick={() => setVerPass(!verPass)}
-                  style={{position:'absolute', right:10, top:'50%', transform:'translateY(-50%)', background:'none', border:'none', cursor:'pointer', color:'#6ec194'}}>
+                  style={{position:'absolute', right:10, top:'50%', transform:'translateY(-50%)', background:'none', border:'none', cursor:'pointer', color:'#9dbfa9'}}>
                   {verPass ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
               </div>
-              {errores.password && <p style={{color:'#b91c1c', fontSize:'0.75rem', fontFamily:'Georgia,serif', marginBottom:8}}>{errores.password}</p>}
+              {errores.password && <p style={{color:'#b91c1c', fontSize:'0.75rem', fontFamily:'var(--font-marca)', marginBottom:8}}>{errores.password}</p>}
             </div>
 
             <button type="submit" disabled={cargando} style={{...C.btn, opacity: cargando ? 0.7 : 1}}>
@@ -187,9 +187,9 @@ export default function Login() {
                 <Phone size={15} style={C.icon} />
                 <input type="tel" value={form.telefono} onChange={e => set('telefono', e.target.value)}
                   placeholder="+57 310 263 1592" disabled={otpEnviado}
-                  style={{...C.input, borderColor: errores.telefono ? '#fca5a5' : '#ddd6c2', background: otpEnviado ? '#F5F0E1' : '#fdfbf6'}} />
+                  style={{...C.input, borderColor: errores.telefono ? '#fca5a5' : '#dcd8c9', background: otpEnviado ? '#f6f3eb' : '#fbfaf6'}} />
               </div>
-              {errores.telefono && <p style={{color:'#b91c1c', fontSize:'0.75rem', fontFamily:'Georgia,serif', marginBottom:8}}>{errores.telefono}</p>}
+              {errores.telefono && <p style={{color:'#b91c1c', fontSize:'0.75rem', fontFamily:'var(--font-marca)', marginBottom:8}}>{errores.telefono}</p>}
             </div>
 
             {otpEnviado && (
@@ -197,10 +197,10 @@ export default function Login() {
                 <label style={C.label}>Codigo de verificacion</label>
                 <input type="text" value={form.otp} onChange={e => set('otp', e.target.value)}
                   placeholder="123456" maxLength={6}
-                  style={{...C.input, textAlign:'center', fontSize:'1.3rem', letterSpacing:'0.3em', paddingLeft:12, borderColor: errores.otp ? '#fca5a5' : '#ddd6c2', marginBottom:4}} />
-                {errores.otp && <p style={{color:'#b91c1c', fontSize:'0.75rem', fontFamily:'Georgia,serif', marginBottom:8}}>{errores.otp}</p>}
+                  style={{...C.input, textAlign:'center', fontSize:'1.3rem', letterSpacing:'0.3em', paddingLeft:12, borderColor: errores.otp ? '#fca5a5' : '#dcd8c9', marginBottom:4}} />
+                {errores.otp && <p style={{color:'#b91c1c', fontSize:'0.75rem', fontFamily:'var(--font-marca)', marginBottom:8}}>{errores.otp}</p>}
                 <button type="button" onClick={() => { setOtpEnviado(false); set('otp',''); }}
-                  style={{background:'none', border:'none', cursor:'pointer', color:'#146b42', fontFamily:'Georgia,serif', fontSize:'0.78rem', marginBottom:12}}>
+                  style={{background:'none', border:'none', cursor:'pointer', color:'#2f6549', fontFamily:'var(--font-marca)', fontSize:'0.78rem', marginBottom:12}}>
                   Cambiar numero
                 </button>
               </div>
@@ -221,7 +221,7 @@ export default function Login() {
 
         {/* Google */}
         <button onClick={loginGoogle} disabled={cargando}
-          style={{...C.btn, background:'white', color:'#0a3d28', border:'1px solid #ddd6c2', display:'flex', alignItems:'center', justifyContent:'center', gap:10, marginTop:0, opacity: cargando ? 0.7 : 1}}>
+          style={{...C.btn, background:'white', color:'#16422e', border:'1px solid #dcd8c9', display:'flex', alignItems:'center', justifyContent:'center', gap:10, marginTop:0, opacity: cargando ? 0.7 : 1}}>
           <svg width="18" height="18" viewBox="0 0 48 48">
             <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
             <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>

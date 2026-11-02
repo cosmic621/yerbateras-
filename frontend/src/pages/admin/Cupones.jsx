@@ -4,8 +4,8 @@ import AdminSidebar from '../../components/admin/AdminSidebar';
 import api from '../../services/api';
 import Swal from 'sweetalert2';
 
-const inputStyle = { width:'100%', padding:'9px 12px', border:'1px solid #ddd6c2', fontFamily:'Georgia,serif', fontSize:'0.85rem', color:'#052a1c', background:'#fdfbf6', outline:'none', boxSizing:'border-box' };
-const labelStyle = { display:'block', fontFamily:'Georgia,serif', fontSize:'0.8rem', fontWeight:'bold', color:'#0a3d28', marginBottom:5, marginTop:12 };
+const inputStyle = { width:'100%', padding:'9px 12px', border:'1px solid #dcd8c9', fontFamily:'var(--font-marca)', fontSize:'0.85rem', color:'#0f3c27', background:'#fbfaf6', outline:'none', boxSizing:'border-box' };
+const labelStyle = { display:'block', fontFamily:'var(--font-marca)', fontSize:'0.8rem', fontWeight:'bold', color:'#16422e', marginBottom:5, marginTop:12 };
 
 function ModalCupon({ onClose, onSave }) {
   const [form, setForm] = useState({ codigo: '', tipo: 'porcentaje', valor: '', minimo_compra: '', usos_maximos: '', expira_en: '' });
@@ -14,7 +14,7 @@ function ModalCupon({ onClose, onSave }) {
 
   const guardar = async () => {
     if (!form.codigo.trim() || !form.valor) {
-      Swal.fire({ icon:'warning', title:'Completa código y valor', confirmButtonColor:'#052a1c' }); return;
+      Swal.fire({ icon:'warning', title:'Completa código y valor', confirmButtonColor:'#0f3c27' }); return;
     }
     setCargando(true);
     try {
@@ -27,16 +27,16 @@ function ModalCupon({ onClose, onSave }) {
       });
       onSave();
     } catch (err) {
-      Swal.fire({ icon:'error', title:'Error', text: err.response?.data?.mensaje || 'Error al crear', confirmButtonColor:'#052a1c' });
+      Swal.fire({ icon:'error', title:'Error', text: err.response?.data?.mensaje || 'Error al crear', confirmButtonColor:'#0f3c27' });
     } finally { setCargando(false); }
   };
 
   return (
     <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:100, display:'flex', alignItems:'flex-start', justifyContent:'center', padding:'2rem 1rem', overflowY:'auto' }}>
       <div style={{ background:'white', width:'100%', maxWidth:460, boxShadow:'0 20px 60px rgba(0,0,0,0.2)' }}>
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px', background:'#052a1c' }}>
-          <p style={{ fontFamily:'Georgia,serif', fontWeight:'bold', color:'#F5F0E1', margin:0 }}>Nuevo cupón</p>
-          <button onClick={onClose} style={{ background:'none', border:'none', cursor:'pointer', color:'#6ec194' }}><X size={18} /></button>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px', background:'#0f3c27' }}>
+          <p style={{ fontFamily:'var(--font-marca)', fontWeight:'bold', color:'#f6f3eb', margin:0 }}>Nuevo cupón</p>
+          <button onClick={onClose} style={{ background:'none', border:'none', cursor:'pointer', color:'#9dbfa9' }}><X size={18} /></button>
         </div>
         <div style={{ padding:'20px' }}>
           <label style={labelStyle}>Código *</label>
@@ -95,7 +95,7 @@ export default function AdminCupones() {
       await api.put(`/admin/cupones/${c.id}`, { activo: !c.activo });
       cargar();
     } catch (err) {
-      Swal.fire({ icon: 'error', title: 'Error', text: err.response?.data?.mensaje, confirmButtonColor: '#052a1c' });
+      Swal.fire({ icon: 'error', title: 'Error', text: err.response?.data?.mensaje, confirmButtonColor: '#0f3c27' });
     }
   };
 
@@ -110,7 +110,7 @@ export default function AdminCupones() {
       Swal.fire({ icon: 'success', title: res.data.mensaje, timer: 2000, showConfirmButton: false, toast: true, position: 'top-end' });
       cargar();
     } catch (err) {
-      Swal.fire({ icon: 'error', title: 'Error', text: err.response?.data?.mensaje, confirmButtonColor: '#052a1c' });
+      Swal.fire({ icon: 'error', title: 'Error', text: err.response?.data?.mensaje, confirmButtonColor: '#0f3c27' });
     }
   };
 
@@ -138,7 +138,7 @@ export default function AdminCupones() {
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
                   <code className="font-display font-bold text-verde-900 text-base">{c.codigo}</code>
-                  <span className="text-[11px] font-body font-bold px-2 py-0.5 rounded" style={{ background: c.activo ? '#eefaf4' : '#F5F0E1', color: c.activo ? '#0f5535' : '#6ec194' }}>
+                  <span className="text-[11px] font-body font-bold px-2 py-0.5 rounded" style={{ background: c.activo ? '#f1f6f2' : '#f6f3eb', color: c.activo ? '#214f39' : '#9dbfa9' }}>
                     {c.activo ? 'Activo' : 'Inactivo'}
                   </span>
                 </div>

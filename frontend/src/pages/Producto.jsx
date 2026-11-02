@@ -3,7 +3,6 @@ import { useParams, Link } from 'react-router-dom';
 import { Shield, ShoppingCart, ArrowLeft, Leaf, Star, Package, AlertCircle, Truck, RotateCcw, ChevronRight, Award } from 'lucide-react';
 import api from '../services/api';
 import { useCart } from '../context/CartContext';
-import { useAuth } from '../context/AuthContext';
 import Swal from 'sweetalert2';
 
 const TABS = [
@@ -15,16 +14,12 @@ const TABS = [
 export default function Producto() {
   const { id } = useParams();
   const { agregar } = useCart();
-  const { usuario } = useAuth();
   const [producto, setProducto] = useState(null);
   const [cargando, setCargando] = useState(true);
   const [cantidad, setCantidad] = useState(1);
   const [agregando, setAgregando] = useState(false);
   const [imagenActiva, setImagenActiva] = useState(0);
   const [tab, setTab] = useState('descripcion');
-  const [puedeResenar, setPuedeResenar] = useState(null); // null=sin verificar, {puede, motivo}
-  const [enviandoResena, setEnviandoResena] = useState(false);
-  const [formResena, setFormResena] = useState({ calificacion: 5, titulo: '', contenido: '' });
 
   const [resenas, setResenas] = useState([]);
 
@@ -40,40 +35,15 @@ export default function Producto() {
       })
       .finally(() => setCargando(false));
 
-    if (usuario) {
-      api.get(`/productos/${id}/puede-resenar`)
-        .then(r => setPuedeResenar(r.data))
-        .catch(() => setPuedeResenar({ puede: false }));
-    }
-  }, [id, usuario]);
-
-  const enviarResena = async () => {
-    if (!formResena.contenido.trim()) {
-      Swal.fire({ icon: 'warning', title: 'Escribe un comentario', confirmButtonColor: '#052a1c' });
-      return;
-    }
-    setEnviandoResena(true);
-    try {
-      await api.post(`/productos/${id}/resenas`, formResena);
-      Swal.fire({ icon: 'success', title: '¡Gracias por tu reseña!', text: 'Se publicará cuando sea aprobada.', confirmButtonColor: '#052a1c' });
-      setPuedeResenar({ puede: false, motivo: 'ya_reseno' });
-      setFormResena({ calificacion: 5, titulo: '', contenido: '' });
-    } catch (err) {
-      Swal.fire({ icon: 'error', title: 'No se pudo enviar', text: err.response?.data?.mensaje || 'Intenta de nuevo', confirmButtonColor: '#052a1c' });
-    } finally { setEnviandoResena(false); }
-  };
+  }, [id]);
 
   const handleAgregar = async () => {
-    if (!usuario) {
-      Swal.fire({ icon: 'info', title: 'Inicia sesión', text: 'Debes iniciar sesión para comprar.', confirmButtonColor: '#052a1c' });
-      return;
-    }
     setAgregando(true);
     try {
-      await agregar(producto.id, cantidad);
+      await agregar(producto, cantidad);
       Swal.fire({ icon: 'success', title: '¡Agregado al carrito!', timer: 1500, showConfirmButton: false, toast: true, position: 'top-end' });
     } catch (err) {
-      Swal.fire({ icon: 'error', title: 'Error', text: err.response?.data?.mensaje || 'No se pudo agregar', confirmButtonColor: '#052a1c' });
+      Swal.fire({ icon: 'error', title: 'Error', text: err.response?.data?.mensaje || 'No se pudo agregar', confirmButtonColor: '#0f3c27' });
     } finally { setAgregando(false); }
   };
 
@@ -133,7 +103,7 @@ export default function Producto() {
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-3">
               {producto.categoria && <span className="text-xs font-body text-dorado-600 font-semibold uppercase tracking-wide">{producto.categoria}</span>}
-              {producto.certificacion_invima && <span className="badge-invima"><Shield size={10} /> INVIMA</span>}
+              {producto.es_kit && <span className="badge-new">Kit</span>}
               {producto.destacado && <span className="badge-bestseller"><Award size={10} /> Más vendido</span>}
             </div>
             <h1 className="font-display text-3xl font-bold text-verde-900 mb-2 leading-tight">{producto.nombre}</h1>
@@ -183,7 +153,7 @@ export default function Producto() {
             <div className="grid grid-cols-3 gap-3 mb-2">
               {[
                 { icon: Truck, label: 'Envío a toda Colombia' },
-                { icon: Shield, label: 'Certificado INVIMA' },
+                { icon: Shield, label: 'Pago seguro en línea' },
                 { icon: RotateCcw, label: 'Cambios en 5 días' },
               ].map(({ icon: Icon, label }) => (
                 <div key={label} className="flex flex-col items-center text-center gap-1.5 p-3 bg-crema-100 border border-crema-200">
@@ -255,33 +225,6 @@ export default function Producto() {
                   </div>
                 ) : (
                   <p className="text-gray-400 font-body text-sm mb-6">Este producto todavía no tiene reseñas.</p>
-                )}
-
-                {/* Formulario para dejar reseña */}
-                {usuario && puedeResenar?.puede && (
-                  <div className="bg-verde-50 border border-verde-100 p-5 mb-6">
-                    <p className="font-display font-bold text-verde-900 mb-3">Cuéntanos qué te pareció</p>
-                    <div className="flex gap-1 mb-3">
-                      {[1, 2, 3, 4, 5].map(n => (
-                        <button key={n} onClick={() => setFormResena(f => ({ ...f, calificacion: n }))}>
-                          <Star size={22} className={n <= formResena.calificacion ? 'text-dorado-500 fill-dorado-500' : 'text-gray-300 fill-gray-100'} />
-                        </button>
-                      ))}
-                    </div>
-                    <input value={formResena.titulo} onChange={e => setFormResena(f => ({ ...f, titulo: e.target.value }))}
-                      placeholder="Título (opcional)" className="input-field mb-2" />
-                    <textarea value={formResena.contenido} onChange={e => setFormResena(f => ({ ...f, contenido: e.target.value }))}
-                      placeholder="Cuéntanos tu experiencia con este producto..." className="input-field mb-3" rows={3} />
-                    <button onClick={enviarResena} disabled={enviandoResena} className="btn-primary text-sm">
-                      {enviandoResena ? 'Enviando...' : 'Enviar reseña'}
-                    </button>
-                  </div>
-                )}
-                {usuario && puedeResenar?.motivo === 'ya_reseno' && (
-                  <p className="text-sm font-body text-verde-600 mb-6 flex items-center gap-1.5">✓ Ya dejaste tu reseña de este producto.</p>
-                )}
-                {usuario && puedeResenar?.motivo === 'no_comprado' && (
-                  <p className="text-sm font-body text-gray-400 mb-6">Solo quienes ya recibieron este producto pueden dejar una reseña.</p>
                 )}
 
                 {/* Lista de reseñas */}

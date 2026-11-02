@@ -4,8 +4,8 @@ import AdminSidebar from '../../components/admin/AdminSidebar';
 import api from '../../services/api';
 import Swal from 'sweetalert2';
 
-const inputStyle = { width:'100%', padding:'9px 12px', border:'1px solid #ddd6c2', fontFamily:'Georgia,serif', fontSize:'0.85rem', color:'#052a1c', background:'#fdfbf6', outline:'none', boxSizing:'border-box' };
-const labelStyle = { display:'block', fontFamily:'Georgia,serif', fontSize:'0.78rem', fontWeight:'bold', color:'#0a3d28', marginBottom:4, marginTop:10 };
+const inputStyle = { width:'100%', padding:'9px 12px', border:'1px solid #dcd8c9', fontFamily:'var(--font-marca)', fontSize:'0.85rem', color:'#0f3c27', background:'#fbfaf6', outline:'none', boxSizing:'border-box' };
+const labelStyle = { display:'block', fontFamily:'var(--font-marca)', fontSize:'0.78rem', fontWeight:'bold', color:'#16422e', marginBottom:4, marginTop:10 };
 
 function ModalPregunta({ pregunta, onClose, onSave }) {
   const esEdicion = !!pregunta?.id;
@@ -16,23 +16,23 @@ function ModalPregunta({ pregunta, onClose, onSave }) {
   const [cargando, setCargando] = useState(false);
 
   const guardar = async () => {
-    if (!form.texto.trim()) { Swal.fire({ icon:'warning', title:'Escribe el texto de la pregunta', confirmButtonColor:'#052a1c' }); return; }
+    if (!form.texto.trim()) { Swal.fire({ icon:'warning', title:'Escribe el texto de la pregunta', confirmButtonColor:'#0f3c27' }); return; }
     setCargando(true);
     try {
       if (esEdicion) await api.put(`/admin/botiquin/preguntas/${pregunta.id}`, form);
       else await api.post('/admin/botiquin/preguntas', form);
       onSave();
     } catch (err) {
-      Swal.fire({ icon:'error', title:'Error', text: err.response?.data?.mensaje, confirmButtonColor:'#052a1c' });
+      Swal.fire({ icon:'error', title:'Error', text: err.response?.data?.mensaje, confirmButtonColor:'#0f3c27' });
     } finally { setCargando(false); }
   };
 
   return (
     <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:100, display:'flex', alignItems:'flex-start', justifyContent:'center', padding:'2rem 1rem', overflowY:'auto' }}>
       <div style={{ background:'white', width:'100%', maxWidth:460, boxShadow:'0 20px 60px rgba(0,0,0,0.2)' }}>
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px', background:'#052a1c' }}>
-          <p style={{ fontFamily:'Georgia,serif', fontWeight:'bold', color:'#F5F0E1', margin:0 }}>{esEdicion ? 'Editar pregunta' : 'Nueva pregunta'}</p>
-          <button onClick={onClose} style={{ background:'none', border:'none', cursor:'pointer', color:'#6ec194' }}><X size={18} /></button>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px', background:'#0f3c27' }}>
+          <p style={{ fontFamily:'var(--font-marca)', fontWeight:'bold', color:'#f6f3eb', margin:0 }}>{esEdicion ? 'Editar pregunta' : 'Nueva pregunta'}</p>
+          <button onClick={onClose} style={{ background:'none', border:'none', cursor:'pointer', color:'#9dbfa9' }}><X size={18} /></button>
         </div>
         <div style={{ padding:'20px' }}>
           <label style={labelStyle}>Texto de la pregunta *</label>
@@ -43,12 +43,12 @@ function ModalPregunta({ pregunta, onClose, onSave }) {
 
           <label style={{ display:'flex', alignItems:'center', gap:8, marginTop:14, cursor:'pointer' }}>
             <input type="checkbox" checked={form.es_inicial} onChange={e => setForm(f => ({ ...f, es_inicial: e.target.checked }))} className="w-4 h-4 accent-verde-900" />
-            <span style={{ fontFamily:'Georgia,serif', fontSize:'0.85rem', color:'#0a3d28' }}>Es la pregunta inicial (con la que arranca el botiquín)</span>
+            <span style={{ fontFamily:'var(--font-marca)', fontSize:'0.85rem', color:'#16422e' }}>Es la pregunta inicial (con la que arranca el botiquín)</span>
           </label>
           {esEdicion && (
             <label style={{ display:'flex', alignItems:'center', gap:8, marginTop:10, cursor:'pointer' }}>
               <input type="checkbox" checked={form.activa} onChange={e => setForm(f => ({ ...f, activa: e.target.checked }))} className="w-4 h-4 accent-verde-900" />
-              <span style={{ fontFamily:'Georgia,serif', fontSize:'0.85rem', color:'#0a3d28' }}>Activa</span>
+              <span style={{ fontFamily:'var(--font-marca)', fontSize:'0.85rem', color:'#16422e' }}>Activa</span>
             </label>
           )}
 
@@ -70,7 +70,7 @@ function ModalRespuesta({ respuesta, preguntaId, preguntas, onClose, onSave }) {
   const [cargando, setCargando] = useState(false);
 
   const guardar = async () => {
-    if (!form.texto.trim()) { Swal.fire({ icon:'warning', title:'Escribe el texto de la respuesta', confirmButtonColor:'#052a1c' }); return; }
+    if (!form.texto.trim()) { Swal.fire({ icon:'warning', title:'Escribe el texto de la respuesta', confirmButtonColor:'#0f3c27' }); return; }
     setCargando(true);
     try {
       const payload = { ...form, siguiente_pregunta_id: form.siguiente_pregunta_id || null, pregunta_id: preguntaId };
@@ -78,16 +78,16 @@ function ModalRespuesta({ respuesta, preguntaId, preguntas, onClose, onSave }) {
       else await api.post('/admin/botiquin/respuestas', payload);
       onSave();
     } catch (err) {
-      Swal.fire({ icon:'error', title:'Error', text: err.response?.data?.mensaje, confirmButtonColor:'#052a1c' });
+      Swal.fire({ icon:'error', title:'Error', text: err.response?.data?.mensaje, confirmButtonColor:'#0f3c27' });
     } finally { setCargando(false); }
   };
 
   return (
     <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:100, display:'flex', alignItems:'flex-start', justifyContent:'center', padding:'2rem 1rem', overflowY:'auto' }}>
       <div style={{ background:'white', width:'100%', maxWidth:460, boxShadow:'0 20px 60px rgba(0,0,0,0.2)' }}>
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px', background:'#052a1c' }}>
-          <p style={{ fontFamily:'Georgia,serif', fontWeight:'bold', color:'#F5F0E1', margin:0 }}>{esEdicion ? 'Editar respuesta' : 'Nueva respuesta'}</p>
-          <button onClick={onClose} style={{ background:'none', border:'none', cursor:'pointer', color:'#6ec194' }}><X size={18} /></button>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px', background:'#0f3c27' }}>
+          <p style={{ fontFamily:'var(--font-marca)', fontWeight:'bold', color:'#f6f3eb', margin:0 }}>{esEdicion ? 'Editar respuesta' : 'Nueva respuesta'}</p>
+          <button onClick={onClose} style={{ background:'none', border:'none', cursor:'pointer', color:'#9dbfa9' }}><X size={18} /></button>
         </div>
         <div style={{ padding:'20px' }}>
           <label style={labelStyle}>Texto de la respuesta *</label>
@@ -103,7 +103,7 @@ function ModalRespuesta({ respuesta, preguntaId, preguntas, onClose, onSave }) {
               <option key={p.id} value={p.id}>Pasar a: "{p.texto}"</option>
             ))}
           </select>
-          <p style={{ fontFamily:'Georgia,serif', fontSize:'0.72rem', color:'#6ec194', marginTop:4 }}>
+          <p style={{ fontFamily:'var(--font-marca)', fontSize:'0.72rem', color:'#9dbfa9', marginTop:4 }}>
             {form.siguiente_pregunta_id ? 'Esta respuesta llevará a otra pregunta.' : 'Esta respuesta es un resultado — asocia productos después de guardar.'}
           </p>
 
@@ -137,30 +137,30 @@ function ModalProductos({ respuesta, onClose, onSave }) {
       await api.put(`/admin/botiquin/respuestas/${respuesta.id}/productos`, { producto_ids: seleccionados });
       onSave();
     } catch (err) {
-      Swal.fire({ icon:'error', title:'Error', text: err.response?.data?.mensaje, confirmButtonColor:'#052a1c' });
+      Swal.fire({ icon:'error', title:'Error', text: err.response?.data?.mensaje, confirmButtonColor:'#0f3c27' });
     } finally { setCargando(false); }
   };
 
   return (
     <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:100, display:'flex', alignItems:'flex-start', justifyContent:'center', padding:'2rem 1rem', overflowY:'auto' }}>
       <div style={{ background:'white', width:'100%', maxWidth:520, boxShadow:'0 20px 60px rgba(0,0,0,0.2)' }}>
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px', background:'#052a1c' }}>
-          <p style={{ fontFamily:'Georgia,serif', fontWeight:'bold', color:'#F5F0E1', margin:0 }}>Productos para "{respuesta.texto}"</p>
-          <button onClick={onClose} style={{ background:'none', border:'none', cursor:'pointer', color:'#6ec194' }}><X size={18} /></button>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px', background:'#0f3c27' }}>
+          <p style={{ fontFamily:'var(--font-marca)', fontWeight:'bold', color:'#f6f3eb', margin:0 }}>Productos para "{respuesta.texto}"</p>
+          <button onClick={onClose} style={{ background:'none', border:'none', cursor:'pointer', color:'#9dbfa9' }}><X size={18} /></button>
         </div>
         <div style={{ padding:'20px' }}>
           <input value={busqueda} onChange={e => setBusqueda(e.target.value)} placeholder="Buscar producto..." style={{ ...inputStyle, marginBottom: 12 }} />
-          <div style={{ maxHeight: 320, overflowY: 'auto', border: '1px solid #ede8da' }}>
+          <div style={{ maxHeight: 320, overflowY: 'auto', border: '1px solid #ebe7dc' }}>
             {productos.map(p => (
-              <label key={p.id} style={{ display:'flex', alignItems:'center', gap:10, padding:'9px 12px', borderBottom:'1px solid #F5F0E1', cursor:'pointer' }}>
+              <label key={p.id} style={{ display:'flex', alignItems:'center', gap:10, padding:'9px 12px', borderBottom:'1px solid #f6f3eb', cursor:'pointer' }}>
                 <input type="checkbox" checked={seleccionados.includes(p.id)} onChange={() => toggle(p.id)} className="w-4 h-4 accent-verde-900" />
-                <span style={{ fontFamily:'Georgia,serif', fontSize:'0.85rem', color:'#052a1c', flex:1 }}>{p.nombre}</span>
-                <span style={{ fontFamily:'Georgia,serif', fontSize:'0.78rem', color:'#e0a83e' }}>${Number(p.precio).toLocaleString('es-CO')}</span>
+                <span style={{ fontFamily:'var(--font-marca)', fontSize:'0.85rem', color:'#0f3c27', flex:1 }}>{p.nombre}</span>
+                <span style={{ fontFamily:'var(--font-marca)', fontSize:'0.78rem', color:'#c6a15b' }}>${Number(p.precio).toLocaleString('es-CO')}</span>
               </label>
             ))}
-            {productos.length === 0 && <p style={{ padding: 16, fontFamily:'Georgia,serif', fontSize:'0.8rem', color:'#6ec194' }}>Sin resultados</p>}
+            {productos.length === 0 && <p style={{ padding: 16, fontFamily:'var(--font-marca)', fontSize:'0.8rem', color:'#9dbfa9' }}>Sin resultados</p>}
           </div>
-          <p style={{ fontFamily:'Georgia,serif', fontSize:'0.75rem', color:'#6ec194', marginTop: 8 }}>{seleccionados.length} producto(s) seleccionado(s)</p>
+          <p style={{ fontFamily:'var(--font-marca)', fontSize:'0.75rem', color:'#9dbfa9', marginTop: 8 }}>{seleccionados.length} producto(s) seleccionado(s)</p>
           <button onClick={guardar} disabled={cargando} className="btn-primary w-full mt-4">
             {cargando ? 'Guardando...' : 'Guardar asociación'}
           </button>

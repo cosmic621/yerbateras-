@@ -4,38 +4,36 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        display: ['"Playfair Display"', 'Georgia', 'serif'],
-        body: ['"Source Serif 4"', 'Georgia', 'serif'],
-        // Aproximacion a la fuente de la referencia (small-caps, estilo botica).
-        // No es un match exacto — si tienes el archivo/nombre real de la fuente
-        // que usa la empresa, lo cambiamos por el original.
-        label: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+        // Una sola familia para toda la web (como en el flyer): Patrick Hand.
+        display: ['"Patrick Hand"', '"Comic Sans MS"', 'cursive'],
+        body:    ['"Patrick Hand"', '"Comic Sans MS"', 'cursive'],
+        label:   ['"Patrick Hand"', '"Comic Sans MS"', 'cursive'],
       },
       colors: {
-        // ── Extraidos directamente del logo (pip+Pillow, no a ojo) ──
+        // ── Paleta basada en el verde de marca #0f3c27 (referencia: tallerdehierbas.com) ──
         verde: {
-          50:  '#eefaf4',
-          100: '#d6f0e2',
-          200: '#a8dec0',
-          300: '#6ec194',
-          400: '#3aa06e',
-          500: '#1c8452',
-          600: '#146b42',
-          700: '#0f5535',
-          800: '#0a3d28',
-          900: '#052a1c',
+          50:  '#f1f6f2',
+          100: '#e0ebe3',
+          200: '#c5d9cb',
+          300: '#9dbfa9',
+          400: '#6c9d83',
+          500: '#447d61',
+          600: '#2f6549',
+          700: '#214f39',
+          800: '#16422e',
+          900: '#0f3c27',
         },
         dorado: {
-          50:  '#fefaf0',
-          100: '#fbf2dc',
-          200: '#f6e4b8',
-          300: '#efd08f',
-          400: '#e8bc66',
-          500: '#e0a83e',
-          600: '#bc7d28',
-          700: '#99631f',
-          800: '#7a4e18',
-          900: '#5c3a12',
+          50:  '#fbf7ee',
+          100: '#f5ecd7',
+          200: '#ebdab4',
+          300: '#dec58a',
+          400: '#d1b072',
+          500: '#c6a15b',
+          600: '#a58545',
+          700: '#856a38',
+          800: '#66512c',
+          900: '#4a3a20',
         },
         // Piel/terracota del personaje — acentos calidos, bordes, secundarios
         tierra: {
@@ -54,10 +52,10 @@ export default {
         turquesa: { 100: '#d6f2f2', 300: '#66cccc', 500: '#00a5a5', 700: '#007373' },
         morado:   { 100: '#f0dcec', 300: '#cc8fc0', 500: '#a54b96', 700: '#6e3163' },
         crema: {
-          50:  '#fdfbf6',
-          100: '#F5F0E1',
-          200: '#ede8da',
-          300: '#ddd6c2',
+          50:  '#fbfaf6',
+          100: '#f6f3eb',
+          200: '#ebe7dc',
+          300: '#dcd8c9',
         },
       },
       boxShadow: {

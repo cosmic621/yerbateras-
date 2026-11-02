@@ -1,143 +1,54 @@
 const pool = require('../config/db');
 
-// ─── OBTENER carrito del usuario ───────────────────────────
-const obtenerCarrito = async (req, res) => {
-  try {
-    const carrito = await obtenerOCrearCarrito(req.usuario.id);
-    const { rows } = await pool.query(
-      `SELECT ci.id, ci.cantidad, ci.precio_unitario,
-              p.id AS producto_id, p.nombre, p.imagen_principal,
-              p.precio, p.stock, p.presentacion,
-              (ci.cantidad * ci.precio_unitario) AS subtotal
-       FROM carrito_items ci
-       JOIN productos p ON ci.producto_id = p.id
-       WHERE ci.carrito_id = $1`,
-      [carrito.id]
-    );
-    const total = rows.reduce((s, i) => s + parseFloat(i.subtotal), 0);
+// Producto vendible: activo y no perteneciente a una temporada apagada.
+const VENDIBLE = `p.activo = TRUE AND (p.temporada IS NULL OR NOT EXISTS (
+  SELECT 1 FROM secciones_sitio ss WHERE ss.clave = p.temporada AND ss.activa = FALSE))`;
+exports.VENDIBLE = VENDIBLE;
 
-    // "Tambien te puede interesar": productos destacados que NO estan ya en el carrito
-    const idsEnCarrito = rows.map(r => r.producto_id);
-    const sugerenciasQ = await pool.query(
-      `SELECT id, nombre, imagen_principal, precio, precio_descuento
-       FROM productos
-       WHERE activo = TRUE AND stock > 0 ${idsEnCarrito.length ? 'AND id != ALL($1)' : ''}
-       ORDER BY destacado DESC, ventas_totales DESC
-       LIMIT 5`,
-      idsEnCarrito.length ? [idsEnCarrito] : []
-    );
-
-    res.json({ ok: true, carrito_id: carrito.id, notas: carrito.notas, items: rows, total, sugerencias: sugerenciasQ.rows });
-  } catch (err) {
-    console.error('Error obtenerCarrito:', err);
-    res.status(500).json({ ok: false, mensaje: 'Error al obtener carrito' });
+// Normaliza la lista que manda el navegador: [{producto_id, cantidad}] sin repetidos
+const normalizarItems = (items) => {
+  if (!Array.isArray(items) || items.length === 0 || items.length > 50) return null;
+  const mapa = new Map();
+  for (const it of items) {
+    const cantidad = Number(it?.cantidad);
+    if (!it?.producto_id || !Number.isInteger(cantidad) || cantidad < 1 || cantidad > 99) return null;
+    mapa.set(it.producto_id, (mapa.get(it.producto_id) || 0) + cantidad);
   }
+  return [...mapa].map(([producto_id, cantidad]) => ({ producto_id, cantidad }));
 };
+exports.normalizarItems = normalizarItems;
 
-// ─── GUARDAR nota de regalo del carrito ────────────────────
-const actualizarNotas = async (req, res) => {
-  const { notas } = req.body;
-  try {
-    const carrito = await obtenerOCrearCarrito(req.usuario.id);
-    await pool.query('UPDATE carritos SET notas = $1 WHERE id = $2', [(notas || '').slice(0, 120), carrito.id]);
-    res.json({ ok: true, mensaje: 'Nota guardada' });
-  } catch (err) {
-    console.error('Error actualizarNotas carrito:', err);
-    res.status(500).json({ ok: false, mensaje: 'Error al guardar la nota' });
-  }
-};
-
-// ─── AGREGAR item al carrito ───────────────────────────────
-const agregarItem = async (req, res) => {
-  const { producto_id, cantidad = 1 } = req.body;
-  if (!producto_id) return res.status(400).json({ ok: false, mensaje: 'producto_id requerido' });
-
-  try {
-    // Verificar producto y stock
-    const prod = await pool.query(
-      'SELECT id, precio, stock FROM productos WHERE id = $1 AND activo = TRUE', [producto_id]
-    );
-    if (!prod.rows[0]) return res.status(404).json({ ok: false, mensaje: 'Producto no disponible' });
-    if (prod.rows[0].stock < cantidad) {
-      return res.status(400).json({ ok: false, mensaje: `Stock insuficiente. Disponible: ${prod.rows[0].stock}` });
-    }
-
-    const carrito = await obtenerOCrearCarrito(req.usuario.id);
-
-    // Upsert item
-    await pool.query(
-      `INSERT INTO carrito_items (carrito_id, producto_id, cantidad, precio_unitario)
-       VALUES ($1,$2,$3,$4)
-       ON CONFLICT (carrito_id, producto_id)
-       DO UPDATE SET cantidad = carrito_items.cantidad + $3, actualizado_en = NOW()`,
-      [carrito.id, producto_id, cantidad, prod.rows[0].precio]
-    );
-
-    res.json({ ok: true, mensaje: 'Producto agregado al carrito' });
-  } catch (err) {
-    res.status(500).json({ ok: false, mensaje: 'Error al agregar al carrito' });
-  }
-};
-
-// ─── ACTUALIZAR cantidad de un item ───────────────────────
-const actualizarItem = async (req, res) => {
-  const { item_id } = req.params;
-  const { cantidad } = req.body;
-  if (!cantidad || cantidad < 1) {
-    return res.status(400).json({ ok: false, mensaje: 'Cantidad inválida' });
-  }
-  try {
-    // Verificar stock
-    const item = await pool.query(
-      `SELECT ci.*, p.stock FROM carrito_items ci
-       JOIN productos p ON ci.producto_id = p.id WHERE ci.id = $1`,
-      [item_id]
-    );
-    if (!item.rows[0]) return res.status(404).json({ ok: false, mensaje: 'Item no encontrado' });
-    if (item.rows[0].stock < cantidad) {
-      return res.status(400).json({ ok: false, mensaje: `Stock insuficiente. Disponible: ${item.rows[0].stock}` });
-    }
-    await pool.query(
-      'UPDATE carrito_items SET cantidad = $1, actualizado_en = NOW() WHERE id = $2',
-      [cantidad, item_id]
-    );
-    res.json({ ok: true, mensaje: 'Cantidad actualizada' });
-  } catch (err) {
-    res.status(500).json({ ok: false, mensaje: 'Error al actualizar item' });
-  }
-};
-
-// ─── ELIMINAR item del carrito ─────────────────────────────
-const eliminarItem = async (req, res) => {
-  try {
-    await pool.query('DELETE FROM carrito_items WHERE id = $1', [req.params.item_id]);
-    res.json({ ok: true, mensaje: 'Producto eliminado del carrito' });
-  } catch (err) {
-    res.status(500).json({ ok: false, mensaje: 'Error al eliminar item' });
-  }
-};
-
-// ─── LIMPIAR carrito ───────────────────────────────────────
-const limpiarCarrito = async (req, res) => {
-  try {
-    const carrito = await obtenerOCrearCarrito(req.usuario.id);
-    await pool.query('DELETE FROM carrito_items WHERE carrito_id = $1', [carrito.id]);
-    res.json({ ok: true, mensaje: 'Carrito vaciado' });
-  } catch (err) {
-    res.status(500).json({ ok: false, mensaje: 'Error al limpiar carrito' });
-  }
-};
-
-// ─── Helper: obtener o crear carrito activo ────────────────
-const obtenerOCrearCarrito = async (usuario_id) => {
-  const { rows } = await pool.query(
-    'SELECT id, notas FROM carritos WHERE usuario_id = $1 AND activo = TRUE', [usuario_id]
+// Lee precios/stock ACTUALES desde la base de datos (nunca se confia en el precio del navegador).
+exports.cargarLineas = async (client, items) => {
+  const ids = items.map(i => i.producto_id);
+  const { rows } = await client.query(
+    `SELECT p.id, p.nombre, p.stock, p.imagen_principal,
+            COALESCE(p.precio_descuento, p.precio) AS precio_final, p.precio, p.precio_descuento
+     FROM productos p WHERE p.id = ANY($1::uuid[]) AND ${VENDIBLE}`,
+    [ids]
   );
-  if (rows[0]) return rows[0];
-  const ins = await pool.query(
-    'INSERT INTO carritos (usuario_id) VALUES ($1) RETURNING id, notas', [usuario_id]
-  );
-  return ins.rows[0];
+  const porId = new Map(rows.map(r => [r.id, r]));
+  return items.map(it => {
+    const p = porId.get(it.producto_id);
+    if (!p) return { producto_id: it.producto_id, disponible: false, cantidad: it.cantidad };
+    return {
+      producto_id: p.id, nombre: p.nombre, imagen: p.imagen_principal, stock: p.stock,
+      precio: Number(p.precio_final), precio_original: Number(p.precio),
+      cantidad: it.cantidad, disponible: p.stock > 0,
+      subtotal: Number(p.precio_final) * Math.min(it.cantidad, p.stock),
+    };
+  });
 };
 
-module.exports = { obtenerCarrito, agregarItem, actualizarItem, eliminarItem, limpiarCarrito, actualizarNotas };
+// POST /api/carrito/validar  { items: [{producto_id, cantidad}] }
+exports.validarCarrito = async (req, res) => {
+  const items = normalizarItems(req.body.items);
+  if (!items) return res.status(400).json({ ok: false, mensaje: 'Carrito inválido' });
+  try {
+    const lineas = await exports.cargarLineas(pool, items);
+    res.json({ ok: true, lineas });
+  } catch (err) {
+    console.error('Error validarCarrito:', err);
+    res.status(500).json({ ok: false, mensaje: 'Error al validar el carrito' });
+  }
+};

@@ -17,6 +17,8 @@ const citasRoutes    = require('./routes/citas.routes');
 const newsletterRoutes = require('./routes/newsletter.routes');
 const cotizacionesRoutes = require('./routes/cotizaciones.routes');
 const botiquinRoutes = require('./routes/botiquin.routes');
+const talleresRoutes = require('./routes/talleres.routes');
+const eventosRoutes  = require('./routes/eventos.routes');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -43,6 +45,8 @@ app.use('/api/citas',     citasRoutes);
 app.use('/api/newsletter', newsletterRoutes);
 app.use('/api/cotizaciones', cotizacionesRoutes);
 app.use('/api/botiquin', botiquinRoutes);
+app.use('/api/talleres', talleresRoutes);
+app.use('/api/eventos',  eventosRoutes);
 
 app.get('/health', (req, res) =>
   res.json({ status:'ok', service:'Yerbateras API', ts: new Date() })

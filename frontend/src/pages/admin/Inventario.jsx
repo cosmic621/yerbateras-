@@ -5,17 +5,17 @@ import api from '../../services/api';
 import Swal from 'sweetalert2';
 
 const S = {
-  h1:   { fontFamily:'Georgia,serif', fontSize:'1.4rem', fontWeight:'bold', color:'#052a1c', margin:'0 0 1.5rem' },
-  tabla:{ width:'100%', borderCollapse:'collapse', background:'white', border:'1px solid #ede8da' },
-  th:   { fontFamily:'Georgia,serif', fontSize:'0.75rem', fontWeight:'bold', color:'#146b42', letterSpacing:'0.06em', textTransform:'uppercase', padding:'10px 14px', textAlign:'left', background:'#fdfbf6', borderBottom:'1px solid #ede8da' },
-  td:   { fontFamily:'Georgia,serif', fontSize:'0.85rem', color:'#052a1c', padding:'11px 14px', borderBottom:'1px solid #F5F0E1' },
-  btn:  { display:'inline-flex', alignItems:'center', gap:6, padding:'6px 12px', fontFamily:'Georgia,serif', fontSize:'0.78rem', fontWeight:'bold', border:'1px solid #146b42', color:'#146b42', background:'white', cursor:'pointer', borderRadius:4 },
+  h1:   { fontFamily:'var(--font-marca)', fontSize:'1.4rem', fontWeight:'bold', color:'#0f3c27', margin:'0 0 1.5rem' },
+  tabla:{ width:'100%', borderCollapse:'collapse', background:'white', border:'1px solid #ebe7dc' },
+  th:   { fontFamily:'var(--font-marca)', fontSize:'0.75rem', fontWeight:'bold', color:'#2f6549', letterSpacing:'0.06em', textTransform:'uppercase', padding:'10px 14px', textAlign:'left', background:'#fbfaf6', borderBottom:'1px solid #ebe7dc' },
+  td:   { fontFamily:'var(--font-marca)', fontSize:'0.85rem', color:'#0f3c27', padding:'11px 14px', borderBottom:'1px solid #f6f3eb' },
+  btn:  { display:'inline-flex', alignItems:'center', gap:6, padding:'6px 12px', fontFamily:'var(--font-marca)', fontSize:'0.78rem', fontWeight:'bold', border:'1px solid #2f6549', color:'#2f6549', background:'white', cursor:'pointer', borderRadius:4 },
 };
 
 const badgeStock = (estado) => {
-  const map = { agotado:{bg:'#fef2f2',color:'#b91c1c'}, bajo:{bg:'#fefaf0',color:'#99631f'}, ok:{bg:'#eefaf4',color:'#146b42'} };
+  const map = { agotado:{bg:'#fef2f2',color:'#b91c1c'}, bajo:{bg:'#fbf7ee',color:'#856a38'}, ok:{bg:'#f1f6f2',color:'#2f6549'} };
   const s = map[estado] || map.ok;
-  return { display:'inline-block', background:s.bg, color:s.color, fontFamily:'Georgia,serif', fontSize:'0.72rem', fontWeight:'bold', padding:'3px 8px', borderRadius:3 };
+  return { display:'inline-block', background:s.bg, color:s.color, fontFamily:'var(--font-marca)', fontSize:'0.72rem', fontWeight:'bold', padding:'3px 8px', borderRadius:3 };
 };
 
 export default function AdminInventario() {
@@ -32,14 +32,14 @@ export default function AdminInventario() {
   const ajustar = async (prod) => {
     const { value } = await Swal.fire({
       title: `Ajustar stock`,
-      html: `<p style="font-family:Georgia,serif;font-size:0.9rem;color:#0a3d28;margin-bottom:12px"><b>${prod.nombre}</b><br>Stock actual: <b>${prod.stock}</b></p>
+      html: `<p style="font-family:var(--font-marca);font-size:0.9rem;color:#16422e;margin-bottom:12px"><b>${prod.nombre}</b><br>Stock actual: <b>${prod.stock}</b></p>
         <select id="tipo" class="swal2-input" style="margin-bottom:8px">
           <option value="entrada">Entrada — agregar stock</option>
           <option value="salida">Salida — reducir stock</option>
         </select>
         <input id="cantidad" type="number" min="1" class="swal2-input" placeholder="Cantidad">
         <input id="motivo" class="swal2-input" placeholder="Motivo (opcional)">`,
-      showCancelButton: true, confirmButtonText:'Aplicar', cancelButtonText:'Cancelar', confirmButtonColor:'#052a1c',
+      showCancelButton: true, confirmButtonText:'Aplicar', cancelButtonText:'Cancelar', confirmButtonColor:'#0f3c27',
       preConfirm: () => ({
         tipo: document.getElementById('tipo').value,
         cantidad: parseInt(document.getElementById('cantidad').value),
@@ -52,7 +52,7 @@ export default function AdminInventario() {
       Swal.fire({ icon:'success', title:'Stock actualizado', timer:1500, showConfirmButton:false });
       cargar();
     } catch (err) {
-      Swal.fire({ icon:'error', title:'Error', text: err.response?.data?.mensaje, confirmButtonColor:'#052a1c' });
+      Swal.fire({ icon:'error', title:'Error', text: err.response?.data?.mensaje, confirmButtonColor:'#0f3c27' });
     }
   };
 
@@ -64,12 +64,12 @@ export default function AdminInventario() {
         <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'1.5rem', flexWrap:'wrap', gap:12}}>
           <h1 style={{...S.h1, margin:0}}>Inventario</h1>
           <input value={buscar} onChange={e => setBuscar(e.target.value)} placeholder="Buscar producto..."
-            style={{fontFamily:'Georgia,serif', fontSize:'0.85rem', border:'1px solid #ddd6c2', padding:'8px 12px', color:'#052a1c', background:'#fdfbf6', outline:'none', width:220}} />
+            style={{fontFamily:'var(--font-marca)', fontSize:'0.85rem', border:'1px solid #dcd8c9', padding:'8px 12px', color:'#0f3c27', background:'#fbfaf6', outline:'none', width:220}} />
         </div>
 
         {cargando ? (
           <div style={{display:'flex', justifyContent:'center', padding:'3rem'}}>
-            <div style={{width:28, height:28, border:'3px solid #ede8da', borderTopColor:'#146b42', borderRadius:'50%', animation:'spin 0.8s linear infinite'}} />
+            <div style={{width:28, height:28, border:'3px solid #ebe7dc', borderTopColor:'#2f6549', borderRadius:'50%', animation:'spin 0.8s linear infinite'}} />
             <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
           </div>
         ) : (
@@ -83,15 +83,15 @@ export default function AdminInventario() {
             </thead>
             <tbody>
               {filtrados.map((p, i) => (
-                <tr key={p.id} style={{background: i % 2 === 0 ? 'white' : '#fdfbf6'}}>
+                <tr key={p.id} style={{background: i % 2 === 0 ? 'white' : '#fbfaf6'}}>
                   <td style={S.td}><b>{p.nombre}</b></td>
-                  <td style={{...S.td, color:'#6ec194'}}>{p.categoria || '—'}</td>
+                  <td style={{...S.td, color:'#9dbfa9'}}>{p.categoria || '—'}</td>
                   <td style={S.td}>
-                    <span style={{fontFamily:'Georgia,serif', fontSize:'1.1rem', fontWeight:'bold', color: p.stock === 0 ? '#b91c1c' : p.stock <= p.stock_minimo ? '#99631f' : '#146b42'}}>
+                    <span style={{fontFamily:'var(--font-marca)', fontSize:'1.1rem', fontWeight:'bold', color: p.stock === 0 ? '#b91c1c' : p.stock <= p.stock_minimo ? '#856a38' : '#2f6549'}}>
                       {p.stock}
                     </span>
                   </td>
-                  <td style={{...S.td, color:'#6ec194'}}>{p.stock_minimo}</td>
+                  <td style={{...S.td, color:'#9dbfa9'}}>{p.stock_minimo}</td>
                   <td style={S.td}>
                     <span style={badgeStock(p.estado_stock)}>
                       {p.estado_stock === 'agotado' ? 'Agotado' : p.estado_stock === 'bajo' ? 'Stock bajo' : 'OK'}
@@ -99,15 +99,15 @@ export default function AdminInventario() {
                   </td>
                   <td style={S.td}>
                     <button onClick={() => ajustar(p)} style={S.btn}
-                      onMouseEnter={e => { e.currentTarget.style.background='#052a1c'; e.currentTarget.style.color='#F5F0E1'; }}
-                      onMouseLeave={e => { e.currentTarget.style.background='white'; e.currentTarget.style.color='#146b42'; }}>
+                      onMouseEnter={e => { e.currentTarget.style.background='#0f3c27'; e.currentTarget.style.color='#f6f3eb'; }}
+                      onMouseLeave={e => { e.currentTarget.style.background='white'; e.currentTarget.style.color='#2f6549'; }}>
                       <Package size={13} /> Ajustar
                     </button>
                   </td>
                 </tr>
               ))}
               {filtrados.length === 0 && (
-                <tr><td colSpan={6} style={{...S.td, textAlign:'center', color:'#6ec194', padding:'2rem'}}>No se encontraron productos</td></tr>
+                <tr><td colSpan={6} style={{...S.td, textAlign:'center', color:'#9dbfa9', padding:'2rem'}}>No se encontraron productos</td></tr>
               )}
             </tbody>
           </table>

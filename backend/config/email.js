@@ -8,6 +8,9 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// Escapa texto del usuario antes de meterlo en un correo HTML
+const esc = (t) => String(t ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
 const BASE_URL = process.env.CLIENT_URL || 'http://localhost:5173';
 
 // ─── Template base HTML ────────────────────────────────────
@@ -19,7 +22,7 @@ const htmlBase = (contenido) => `
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Yerbateras</title>
   <style>
-    body { margin:0; padding:0; background:#f5f5f0; font-family: Georgia, serif; }
+    body { margin:0; padding:0; background:#f5f5f0; font-family: 'Patrick Hand', 'Comic Sans MS', cursive; }
     .wrapper { max-width:600px; margin:0 auto; background:#fff; }
     .header { background: linear-gradient(135deg, #1a4a2e 0%, #2d6a44 100%); padding:40px 30px; text-align:center; }
     .header h1 { color:#c9a227; margin:0; font-size:32px; letter-spacing:3px; text-transform:uppercase; }
@@ -38,11 +41,11 @@ const htmlBase = (contenido) => `
   <div class="wrapper">
     <div class="header">
       <h1>🌿 Yerbateras</h1>
-      <p>Medicina Natural con Certificación INVIMA</p>
+      <p>Plantas medicinales y cosmética natural</p>
     </div>
     <div class="body">${contenido}</div>
     <div class="footer">
-      <p>© ${new Date().getFullYear()} Yerbateras · Medicina natural certificada</p>
+      <p>© ${new Date().getFullYear()} Yerbateras · Plantas medicinales y cosmética natural</p>
       <p style="margin-top:8px">
         <a href="${BASE_URL}" style="color:#c9a227;text-decoration:none;">Visitar tienda</a> &nbsp;·&nbsp;
         <a href="mailto:info@yerbateras.co" style="color:#c9a227;text-decoration:none;">Contacto</a>
@@ -56,7 +59,7 @@ const htmlBase = (contenido) => `
 const enviarEmailVerificacion = async (email, nombre, token) => {
   const url = `${BASE_URL}/verificar-email?token=${token}`;
   const html = htmlBase(`
-    <span class="badge">🏥 Certificado INVIMA</span>
+    <span class="badge">🌿 Bienvenida/o</span>
     <h2>¡Bienvenido/a a Yerbateras, ${nombre}!</h2>
     <p>Gracias por registrarte en nuestra tienda de medicina natural. Para activar tu cuenta y comenzar a explorar nuestros productos certificados, confirma tu correo electrónico:</p>
     <a href="${url}" class="btn">✅ Verificar mi cuenta</a>
@@ -268,7 +271,8 @@ const enviarPagoCitaConfirmado = async (email, nombre, cita) => {
       <p style="margin:4px 0"><strong>🕐 Hora:</strong> ${cita.hora_inicio.slice(0,5)} - ${cita.hora_fin.slice(0,5)}</p>
       <p style="margin:4px 0"><strong>💳 Monto pagado:</strong> $${Number(cita.monto_pagado).toLocaleString('es-CO')} COP</p>
     </div>
-    <p>Te esperamos. Si necesitas cambiar tu horario, puedes reprogramarla desde tu cuenta o escribiéndonos.</p>
+    <p>Te esperamos. <strong>Política de cancelación:</strong> la cita solo se puede reprogramar (no hay devolución de dinero) y debe hacerse con <strong>mínimo 24 horas</strong> de anticipación, escribiéndonos o desde este enlace privado:</p>
+    ${cita.token_gestion ? `<p><a href="${process.env.FRONTEND_URL || ''}/cita/${cita.token_gestion}" style="color:#0f3c27">Ver o reprogramar mi cita</a></p>` : ''}
     <hr class="divider">
     <p style="font-size:13px;color:#888">Gracias por confiar en Yerbateras.</p>
   `);
@@ -281,7 +285,52 @@ const enviarPagoCitaConfirmado = async (email, nombre, cita) => {
   });
 };
 
+// ─── Email: inscripcion a taller (anticipo o saldo recibido) ──
+const enviarInscripcionTaller = async (email, nombre, insc, pagoRecibido) => {
+  const fecha = new Date(`${insc.fecha_taller}T00:00:00`).toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  const saldo = Number(insc.monto_total) - Number(insc.monto_pagado);
+  const html = htmlBase(`
+    <span class="badge">✅ Pago recibido</span>
+    <h2>¡Listo, ${esc(nombre)}! ${insc.estado === 'confirmada' ? 'Tu cupo está confirmado' : 'Recibimos tu pago'}</h2>
+    <div style="background:#f0f7f0;border-radius:8px;padding:16px 20px;margin:20px 0">
+      <p style="margin:4px 0"><strong>🌿 Taller:</strong> ${esc(insc.titulo)}</p>
+      <p style="margin:4px 0"><strong>📅 Fecha:</strong> ${fecha} · ${insc.hora_taller}</p>
+      ${insc.lugar ? `<p style="margin:4px 0"><strong>📍 Lugar:</strong> ${esc(insc.lugar)}</p>` : ''}
+      <p style="margin:4px 0"><strong>👥 Asistentes:</strong> ${insc.asistentes}</p>
+      <p style="margin:4px 0"><strong>💳 Pago recibido ahora:</strong> $${Number(pagoRecibido).toLocaleString('es-CO')} COP</p>
+      <p style="margin:4px 0"><strong>Total pagado:</strong> $${Number(insc.monto_pagado).toLocaleString('es-CO')} de $${Number(insc.monto_total).toLocaleString('es-CO')} COP</p>
+      ${saldo > 0 ? `<p style="margin:4px 0;color:#99631f"><strong>Saldo pendiente:</strong> $${saldo.toLocaleString('es-CO')} COP</p>` : '<p style="margin:4px 0"><strong>Taller pagado por completo ✔</strong></p>'}
+    </div>
+    ${saldo > 0 ? '<p>Puedes pagar el saldo cuando quieras escribiéndonos, o el día del taller.</p>' : ''}
+    <hr class="divider">
+    <p style="font-size:13px;color:#888">Gracias por ser parte de Yerbateras.</p>
+  `);
+  await transporter.sendMail({
+    from: `"🌿 Yerbateras" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: `✅ Inscripción al taller "${insc.titulo}" — Yerbateras`,
+    html
+  });
+};
+
+const enviarAlertaInscripcionTaller = async (emailNegocio, insc, pagoRecibido) => {
+  const html = htmlBase(`
+    <h2>Nueva inscripción a taller${insc.requiere_revision ? ' ⚠️ (revisar cupo)' : ''}</h2>
+    <p><strong>${esc(insc.titulo)}</strong> — ${insc.fecha_taller} ${insc.hora_taller}</p>
+    <p>${esc(insc.nombre)} · ${esc(insc.email)} · ${esc(insc.telefono)}</p>
+    <p>Asistentes: ${insc.asistentes} · Pagó ahora: $${Number(pagoRecibido).toLocaleString('es-CO')} · Total pagado: $${Number(insc.monto_pagado).toLocaleString('es-CO')} de $${Number(insc.monto_total).toLocaleString('es-CO')}</p>
+    ${insc.requiere_revision ? '<p style="color:#b91c1c"><strong>El pago llegó después de vencer la reserva y el taller ya estaba lleno. Revisa el cupo en el panel.</strong></p>' : ''}
+  `);
+  await transporter.sendMail({
+    from: `"🌿 Yerbateras" <${process.env.EMAIL_USER}>`,
+    to: emailNegocio,
+    subject: `Nueva inscripción: ${insc.titulo}`,
+    html
+  });
+};
+
 module.exports = {
   enviarEmailVerificacion, enviarConfirmacionPedido, enviarOtpEmail, enviarVerificacionCita,
   enviarCitaConfirmadaCliente, enviarAlertaCitaNegocio, enviarSolicitudCotizacion, enviarPagoCitaConfirmado,
+  enviarInscripcionTaller, enviarAlertaInscripcionTaller,
 };

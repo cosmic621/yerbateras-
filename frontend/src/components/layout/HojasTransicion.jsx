@@ -14,7 +14,7 @@ const FORMAS = [
   ),
 ];
 
-const COLORES = ['#1c8452', '#3aa06e', '#e0a83e', '#efd08f', '#6ec194'];
+const COLORES = ['#447d61', '#6c9d83', '#c6a15b', '#dec58a', '#9dbfa9'];
 
 const generarHojas = (cantidad) => Array.from({ length: cantidad }).map((_, i) => ({
   id: `${Date.now()}-${i}`,

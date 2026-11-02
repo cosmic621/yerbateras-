@@ -11,6 +11,10 @@ const generarReferencia = () =>
 const generarReferenciaCita = () =>
   `CITA-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
 
+// Pagos de talleres (anticipo o saldo): prefijo "TALL-".
+const generarReferenciaTaller = () =>
+  `TALL-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
+
 // Firma de integridad exigida por Wompi para el Widget/Web Checkout.
 // Formula oficial (el orden importa): SHA256(referencia + monto_en_centavos + moneda + llave_de_integridad)
 // https://docs.wompi.co/en/docs/colombia/widget-checkout-web/
@@ -31,11 +35,12 @@ const verificarFirmaEvento = (event) => {
   if (!signature?.properties?.length || !signature?.checksum || !timestamp) return false;
 
   const cadena = signature.properties
-    .map(prop => obtenerValorAnidado(event, prop))
+    // Los paths de signature.properties (ej. "transaction.id") apuntan al objeto `data` del evento
+    .map(prop => obtenerValorAnidado(event.data, prop))
     .join('') + timestamp + process.env.WOMPI_EVENTS_KEY;
 
   const checksumCalculado = crypto.createHash('sha256').update(cadena).digest('hex');
   return checksumCalculado.toUpperCase() === signature.checksum.toUpperCase();
 };
 
-module.exports = { generarReferencia, generarReferenciaCita, firmarIntegridad, verificarFirmaEvento };
+module.exports = { generarReferencia, generarReferenciaCita, generarReferenciaTaller, firmarIntegridad, verificarFirmaEvento };

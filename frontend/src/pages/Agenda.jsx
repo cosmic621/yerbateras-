@@ -6,15 +6,15 @@ const TOKEN_KEY = 'yb_agenda_token';
 const hoyISO = () => new Date().toISOString().slice(0, 10);
 
 const ESTADOS = {
-  confirmada:   { label: 'Confirmada',   color: '#2d6a44', bg: '#f0f7ec' },
+  confirmada:   { label: 'Confirmada',   color: '#2f6549', bg: '#f1f6f2' },
   completada:   { label: 'Completada',   color: '#5C6B3A', bg: '#eef4e6' },
   no_asistio:   { label: 'No asistió',   color: '#b91c1c', bg: '#fef2f2' },
   cancelada:    { label: 'Cancelada',    color: '#8fa882', bg: '#f5f5f0' },
 };
 
 const C = {
-  page:  { minHeight:'100vh', background:'#f5f5f0', fontFamily:'Georgia,serif' },
-  header:{ background:'#1E2E1A', padding:'1.25rem 1.5rem', display:'flex', alignItems:'center', justifyContent:'space-between' },
+  page:  { minHeight:'100vh', background:'#f5f5f0', fontFamily:'var(--font-marca)' },
+  header:{ background:'#0f3c27', padding:'1.25rem 1.5rem', display:'flex', alignItems:'center', justifyContent:'space-between' },
   wrap:  { maxWidth:720, margin:'0 auto', padding:'1.5rem' },
 };
 
@@ -39,20 +39,20 @@ function PinGate({ onOk }) {
   };
 
   return (
-    <div style={{minHeight:'100vh', background:'#1E2E1A', display:'flex', alignItems:'center', justifyContent:'center', padding:'2rem'}}>
+    <div style={{minHeight:'100vh', background:'#0f3c27', display:'flex', alignItems:'center', justifyContent:'center', padding:'2rem'}}>
       <form onSubmit={entrar} style={{background:'white', padding:'2.5rem', maxWidth:340, width:'100%', boxShadow:'0 20px 60px rgba(0,0,0,0.3)', textAlign:'center'}}>
-        <div style={{width:52, height:52, background:'#f0f7ec', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 1.25rem'}}>
+        <div style={{width:52, height:52, background:'#f1f6f2', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 1.25rem'}}>
           <Lock size={22} color="#5C6B3A" />
         </div>
-        <p style={{fontFamily:'Georgia,serif', fontSize:'1.2rem', fontWeight:'bold', color:'#1E2E1A', marginBottom:6}}>Agenda de citas</p>
-        <p style={{fontFamily:'Georgia,serif', fontSize:'0.8rem', color:'#8fa882', marginBottom:20}}>Ingresa el PIN para ver las citas del día</p>
+        <p style={{fontFamily:'var(--font-marca)', fontSize:'1.2rem', fontWeight:'bold', color:'#0f3c27', marginBottom:6}}>Agenda de citas</p>
+        <p style={{fontFamily:'var(--font-marca)', fontSize:'0.8rem', color:'#8fa882', marginBottom:20}}>Ingresa el PIN para ver las citas del día</p>
         {error && <div style={{background:'#fef2f2', border:'1px solid #fecaca', color:'#b91c1c', fontSize:'0.8rem', padding:'8px 10px', marginBottom:12}}>{error}</div>}
         <input
           type="password" inputMode="numeric" value={pin} onChange={e => setPin(e.target.value)}
           placeholder="PIN" autoFocus
-          style={{width:'100%', padding:'12px', border:'1px solid #ddd6c2', background:'#faf8f4', fontFamily:'Georgia,serif', fontSize:'1rem', textAlign:'center', letterSpacing:'0.3em', outline:'none', boxSizing:'border-box', marginBottom:14}}
+          style={{width:'100%', padding:'12px', border:'1px solid #dcd8c9', background:'#faf8f4', fontFamily:'var(--font-marca)', fontSize:'1rem', textAlign:'center', letterSpacing:'0.3em', outline:'none', boxSizing:'border-box', marginBottom:14}}
         />
-        <button type="submit" disabled={cargando || !pin} style={{width:'100%', padding:'12px', background:'#1E2E1A', color:'#F5F0E1', fontFamily:'Georgia,serif', fontWeight:'bold', fontSize:'0.88rem', border:'none', cursor:'pointer', opacity:(cargando || !pin) ? 0.6 : 1}}>
+        <button type="submit" disabled={cargando || !pin} style={{width:'100%', padding:'12px', background:'#0f3c27', color:'#f6f3eb', fontFamily:'var(--font-marca)', fontWeight:'bold', fontSize:'0.88rem', border:'none', cursor:'pointer', opacity:(cargando || !pin) ? 0.6 : 1}}>
           {cargando ? 'Verificando...' : 'Entrar'}
         </button>
       </form>
@@ -84,7 +84,7 @@ function TarjetaCita({ cita, onActualizar }) {
         <div>
           <div style={{display:'flex', alignItems:'center', gap:8, marginBottom:4}}>
             <Clock3 size={14} color="#5C6B3A" />
-            <strong style={{color:'#1E2E1A', fontSize:'0.95rem'}}>{cita.hora_inicio.slice(0,5)} - {cita.hora_fin.slice(0,5)}</strong>
+            <strong style={{color:'#0f3c27', fontSize:'0.95rem'}}>{cita.hora_inicio.slice(0,5)} - {cita.hora_fin.slice(0,5)}</strong>
             <span style={{fontSize:'0.7rem', padding:'2px 8px', borderRadius:10, background:est.bg, color:est.color, fontWeight:'bold'}}>{est.label}</span>
           </div>
           <p style={{margin:'2px 0', fontSize:'0.85rem', color:'#2d4a22'}}>💆 {cita.servicio_nombre}</p>
@@ -115,7 +115,7 @@ function TarjetaCita({ cita, onActualizar }) {
               <XCircle size={12} /> No asistió
             </button>
             <button onClick={() => cambiar('cancelada')} disabled={actualizando}
-              style={{fontSize:'0.75rem', padding:'6px 10px', background:'white', color:'#8fa882', border:'1px solid #ddd6c2', cursor:'pointer'}}>
+              style={{fontSize:'0.75rem', padding:'6px 10px', background:'white', color:'#8fa882', border:'1px solid #dcd8c9', cursor:'pointer'}}>
               Cancelar
             </button>
           </>
@@ -156,10 +156,10 @@ function VistaAgenda({ onSalir }) {
       <div style={C.header}>
         <div style={{display:'flex', alignItems:'center', gap:8}}>
           <Calendar size={18} color="#C8874A" />
-          <span style={{color:'#F5F0E1', fontWeight:'bold'}}>Agenda de citas — Yerbateras</span>
+          <span style={{color:'#f6f3eb', fontWeight:'bold'}}>Agenda de citas — Yerbateras</span>
         </div>
         <button onClick={() => { localStorage.removeItem(TOKEN_KEY); onSalir(); }}
-          style={{background:'none', border:'1px solid #5C6B3A', color:'#F5F0E1', fontSize:'0.75rem', padding:'6px 12px', cursor:'pointer'}}>
+          style={{background:'none', border:'1px solid #5C6B3A', color:'#f6f3eb', fontSize:'0.75rem', padding:'6px 12px', cursor:'pointer'}}>
           Salir
         </button>
       </div>
@@ -167,8 +167,8 @@ function VistaAgenda({ onSalir }) {
       <div style={C.wrap}>
         <div style={{display:'flex', gap:10, alignItems:'center', marginBottom:'1.25rem'}}>
           <input type="date" value={fecha} onChange={e => setFecha(e.target.value)}
-            style={{padding:'10px 12px', border:'1px solid #ddd6c2', background:'white', fontFamily:'Georgia,serif', fontSize:'0.85rem'}} />
-          <button onClick={cargar} style={{padding:'10px', background:'white', border:'1px solid #ddd6c2', cursor:'pointer', display:'flex', alignItems:'center'}} aria-label="Recargar">
+            style={{padding:'10px 12px', border:'1px solid #dcd8c9', background:'white', fontFamily:'var(--font-marca)', fontSize:'0.85rem'}} />
+          <button onClick={cargar} style={{padding:'10px', background:'white', border:'1px solid #dcd8c9', cursor:'pointer', display:'flex', alignItems:'center'}} aria-label="Recargar">
             <RefreshCw size={15} color="#5C6B3A" />
           </button>
           <span style={{fontSize:'0.8rem', color:'#5a7052'}}>{citas.length} cita{citas.length !== 1 ? 's' : ''}</span>

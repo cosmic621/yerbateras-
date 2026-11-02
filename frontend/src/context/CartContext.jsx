@@ -1,67 +1,71 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
-import { useAuth } from './AuthContext';
 
 const CartContext = createContext(null);
+const KEY = 'yb_carrito_v2';
 
+const leer = () => {
+  try { const d = JSON.parse(localStorage.getItem(KEY) || '{}'); return { items: d.items || [], notas: d.notas || '' }; }
+  catch { return { items: [], notas: '' }; }
+};
+
+// El carrito vive en el navegador (no hay cuentas). El servidor solo valida precios y stock.
 export const CartProvider = ({ children }) => {
-  const { usuario } = useAuth();
-  const [items, setItems]     = useState([]);
-  const [total, setTotal]     = useState(0);
-  const [notas, setNotas]     = useState('');
-  const [sugerencias, setSugerencias] = useState([]);
-  const [cargando, setCargando] = useState(false);
+  const inicial = leer();
+  const [items, setItems]   = useState(inicial.items);   // [{producto_id, cantidad, nombre, imagen, precio, stock}]
+  const [notas, setNotas]   = useState(inicial.notas);
   const [abierto, setAbierto] = useState(false);
 
-  const cargarCarrito = useCallback(async () => {
-    if (!usuario) { setItems([]); setTotal(0); setNotas(''); setSugerencias([]); return; }
+  useEffect(() => {
+    try { localStorage.setItem(KEY, JSON.stringify({ items, notas })); } catch {}
+  }, [items, notas]);
+
+  // Trae precios/stock actuales y descarta lo que ya no se vende
+  const refrescar = useCallback(async () => {
+    if (!items.length) return;
     try {
-      const { data } = await api.get('/carrito');
-      setItems(data.items || []);
-      setTotal(data.total || 0);
-      setNotas(data.notas || '');
-      setSugerencias(data.sugerencias || []);
+      const { data } = await api.post('/carrito/validar', { items: items.map(i => ({ producto_id: i.producto_id, cantidad: i.cantidad })) });
+      setItems(prev => data.lineas
+        .filter(l => l.nombre !== undefined && l.stock > 0)
+        .map(l => ({
+          producto_id: l.producto_id, nombre: l.nombre, imagen: l.imagen, precio: l.precio, stock: l.stock,
+          cantidad: Math.min(prev.find(p => p.producto_id === l.producto_id)?.cantidad || 1, l.stock),
+        })));
     } catch {}
-  }, [usuario]);
+  }, [items]);
 
-  useEffect(() => { cargarCarrito(); }, [cargarCarrito]);
+  useEffect(() => { if (items.length) refrescar(); /* al cargar el sitio */ // eslint-disable-next-line
+  }, []);
 
-  const agregar = async (producto_id, cantidad = 1) => {
-    setCargando(true);
-    try {
-      await api.post('/carrito/items', { producto_id, cantidad });
-      await cargarCarrito();
-      setAbierto(true);
-    } finally { setCargando(false); }
+  // Acepta el producto completo (lo normal) o solo su id
+  const agregar = async (productoOId, cantidad = 1) => {
+    let p = productoOId;
+    if (typeof p !== 'object') {
+      const { data } = await api.get(`/productos/${p}`);
+      p = data.producto;
+    }
+    const precio = Number(p.precio_descuento || p.precio);
+    const stock = Number(p.stock);
+    if (!(stock > 0)) throw { response: { data: { mensaje: 'Este producto está agotado' } } };
+    setItems(prev => {
+      const ya = prev.find(i => i.producto_id === p.id);
+      if (ya) return prev.map(i => i.producto_id === p.id ? { ...i, cantidad: Math.min(i.cantidad + cantidad, stock), precio, stock } : i);
+      return [...prev, { producto_id: p.id, cantidad: Math.min(cantidad, stock), nombre: p.nombre, imagen: p.imagen_principal, precio, stock }];
+    });
+    setAbierto(true);
   };
 
-  const actualizar = async (item_id, cantidad) => {
-    await api.put(`/carrito/items/${item_id}`, { cantidad });
-    await cargarCarrito();
-  };
+  const actualizar = (producto_id, cantidad) =>
+    setItems(prev => prev.map(i => i.producto_id === producto_id ? { ...i, cantidad: Math.max(1, Math.min(cantidad, i.stock)) } : i));
 
-  const eliminar = async (item_id) => {
-    await api.delete(`/carrito/items/${item_id}`);
-    await cargarCarrito();
-  };
+  const eliminar = (producto_id) => setItems(prev => prev.filter(i => i.producto_id !== producto_id));
+  const limpiar = () => { setItems([]); setNotas(''); };
 
-  const limpiar = async () => {
-    await api.delete('/carrito');
-    setItems([]); setTotal(0); setNotas('');
-  };
-
-  const guardarNotas = async (texto) => {
-    setNotas(texto);
-    await api.put('/carrito/notas', { notas: texto }).catch(() => {});
-  };
-
+  const total = items.reduce((s, i) => s + i.precio * i.cantidad, 0);
   const cantidadTotal = items.reduce((s, i) => s + i.cantidad, 0);
 
   return (
-    <CartContext.Provider value={{
-      items, total, notas, sugerencias, cargando, abierto, setAbierto,
-      cantidadTotal, agregar, actualizar, eliminar, limpiar, guardarNotas, cargarCarrito
-    }}>
+    <CartContext.Provider value={{ items, total, notas, setNotas, abierto, setAbierto, cantidadTotal, agregar, actualizar, eliminar, limpiar, refrescar }}>
       {children}
     </CartContext.Provider>
   );

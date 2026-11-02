@@ -33,8 +33,14 @@ const ORDENES = {
   mas_vendidos:  'p.ventas_totales DESC, p.calificacion_promedio DESC',
 };
 
+const SIN_TEMPORADA_APAGADA = `(p.temporada IS NULL OR NOT EXISTS (
+  SELECT 1 FROM secciones_sitio ss WHERE ss.clave = p.temporada AND ss.activa = FALSE))`;
+
 const listarProductos = async (req, res) => {
-  const { categoria, linea_cuidado, buscar, destacados, orden, page = 1, limit = 12 } = req.query;
+  const { categoria, linea_cuidado, buscar, destacados, orden, es_kit, temporada, promocion } = req.query;
+  // page/limit llegan como texto: se validan y se les pone tope
+  const page = Math.max(parseInt(req.query.page) || 1, 1);
+  const limit = Math.min(Math.max(parseInt(req.query.limit) || 12, 1), 100);
   const offset = (page - 1) * limit;
   const orderBy = ORDENES[orden] || ORDENES.relevancia;
 
@@ -52,6 +58,12 @@ const listarProductos = async (req, res) => {
   }
   if (buscar)    { params.push(`%${buscar}%`); where.push(`(p.nombre ILIKE $${params.length} OR p.descripcion_corta ILIKE $${params.length})`); }
   if (destacados === 'true') where.push('p.destacado = TRUE');
+  if (promocion === 'true') where.push('p.precio_descuento IS NOT NULL');
+  if (es_kit === 'true') where.push('p.es_kit = TRUE');
+  if (es_kit === 'false') where.push('p.es_kit = FALSE');
+  if (temporada) { params.push(temporada); where.push(`p.temporada = $${params.length}`); }
+  // Productos de una temporada apagada (ej. navidad) no se muestran
+  where.push(SIN_TEMPORADA_APAGADA);
 
   const whereClause = where.length ? 'WHERE ' + where.join(' AND ') : '';
 
@@ -66,8 +78,8 @@ const listarProductos = async (req, res) => {
     params.push(limit, offset);
     const { rows } = await pool.query(
       `SELECT p.id, p.nombre, p.descripcion_corta, p.precio, p.precio_descuento,
-              p.stock, p.imagen_principal, p.certificacion_invima,
-              p.presentacion, p.destacado, p.calificacion_promedio, p.total_resenas
+              p.stock, p.imagen_principal,
+              p.presentacion, p.destacado, p.es_kit, p.temporada, p.calificacion_promedio, p.total_resenas
               , c.nombre AS categoria, c.slug AS categoria_slug
        FROM productos p
        LEFT JOIN categorias c ON p.categoria_id = c.id
@@ -96,7 +108,7 @@ const obtenerProducto = async (req, res) => {
       `SELECT p.*, c.nombre AS categoria, c.slug AS categoria_slug
        FROM productos p
        LEFT JOIN categorias c ON p.categoria_id = c.id
-       WHERE p.id = $1 AND p.activo = TRUE`,
+       WHERE p.id = $1 AND p.activo = TRUE AND ${SIN_TEMPORADA_APAGADA}`,
       [req.params.id]
     );
     if (!rows[0]) return res.status(404).json({ ok: false, mensaje: 'Producto no encontrado' });
@@ -128,7 +140,7 @@ const crearProducto = async (req, res) => {
     nombre, descripcion, descripcion_corta, precio, precio_descuento,
     stock, stock_minimo, categoria_id, sku, certificacion_invima,
     principio_activo, indicaciones, contraindicaciones, presentacion,
-    peso_gramos, destacado, lineas_cuidado
+    peso_gramos, destacado, lineas_cuidado, es_kit, contenido_kit, temporada
   } = req.body;
 
   const imagen_principal = req.file ? `/uploads/${req.file.filename}` : null;
@@ -137,14 +149,16 @@ const crearProducto = async (req, res) => {
     const { rows } = await pool.query(
       `INSERT INTO productos (nombre, descripcion, descripcion_corta, precio, precio_descuento,
         stock, stock_minimo, categoria_id, imagen_principal, sku, certificacion_invima,
-        principio_activo, indicaciones, contraindicaciones, presentacion, peso_gramos, destacado)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)
+        principio_activo, indicaciones, contraindicaciones, presentacion, peso_gramos, destacado,
+        es_kit, contenido_kit, temporada)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20)
        RETURNING *`,
       [nombre, descripcion, descripcion_corta, precio, precio_descuento || null,
        stock || 0, stock_minimo || 5, categoria_id || null, imagen_principal,
        sku || null, certificacion_invima || null, principio_activo || null,
        indicaciones || null, contraindicaciones || null, presentacion || null,
-       peso_gramos || null, destacado === 'true' || destacado === true]
+       peso_gramos || null, destacado === 'true' || destacado === true,
+       es_kit === 'true' || es_kit === true, contenido_kit || null, temporada || null]
     );
 
     // Registrar movimiento de inventario
@@ -168,9 +182,18 @@ const crearProducto = async (req, res) => {
 // ─── ACTUALIZAR producto (admin) ───────────────────────────
 const actualizarProducto = async (req, res) => {
   const { id } = req.params;
-  const campos = { ...req.body };
-  const lineas_cuidado = campos.lineas_cuidado;
-  delete campos.lineas_cuidado; // no es una columna de productos, se guarda aparte
+  const lineas_cuidado = req.body.lineas_cuidado;
+  // Solo se aceptan estas columnas (evita inyeccion por nombre de columna y que
+  // se puedan tocar campos internos como ventas_totales o calificacion_promedio).
+  const PERMITIDOS = ['nombre','descripcion','descripcion_corta','precio','precio_descuento','stock','stock_minimo',
+    'categoria_id','sku','certificacion_invima','principio_activo','indicaciones','contraindicaciones','presentacion',
+    'peso_gramos','destacado','activo','es_kit','contenido_kit','temporada'];
+  const NULLABLES = ['precio_descuento','categoria_id','sku','descripcion_corta','descripcion','contenido_kit','temporada','presentacion','principio_activo','indicaciones','contraindicaciones','peso_gramos'];
+  const campos = {};
+  for (const k of PERMITIDOS) {
+    if (req.body[k] === undefined) continue;
+    campos[k] = (req.body[k] === '' && NULLABLES.includes(k)) ? null : req.body[k];
+  }
   if (req.file) campos.imagen_principal = `/uploads/${req.file.filename}`;
 
   try {

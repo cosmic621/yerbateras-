@@ -13,13 +13,11 @@ if (token) api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401) {
+    // Solo existe sesión de administrador. Si caduca, se limpia y /admin vuelve a pedir el login.
+    if (err.response?.status === 401 && !err.config?.url?.includes('/auth/admin-login')) {
       localStorage.removeItem('yb_token');
       delete api.defaults.headers.common['Authorization'];
-      // Redirigir solo si no está en una ruta pública
-      if (!['/', '/tienda', '/producto', '/citas'].some(p => window.location.pathname.startsWith(p))) {
-        window.location.href = '/login';
-      }
+      if (window.location.pathname.startsWith('/admin')) window.location.reload();
     }
     return Promise.reject(err);
   }

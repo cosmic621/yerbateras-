@@ -5,11 +5,11 @@ import api from '../../services/api';
 import Swal from 'sweetalert2';
 
 const S = {
-  tabla: { width:'100%', borderCollapse:'collapse', background:'white', border:'1px solid #ede8da' },
-  th:    { fontFamily:'Georgia,serif', fontSize:'0.72rem', fontWeight:'bold', color:'#146b42', letterSpacing:'0.06em', textTransform:'uppercase', padding:'10px 14px', textAlign:'left', background:'#fdfbf6', borderBottom:'1px solid #ede8da' },
-  td:    { fontFamily:'Georgia,serif', fontSize:'0.84rem', color:'#052a1c', padding:'11px 14px', borderBottom:'1px solid #F5F0E1', verticalAlign:'middle' },
-  label: { display:'block', fontFamily:'Georgia,serif', fontSize:'0.8rem', fontWeight:'bold', color:'#0a3d28', marginBottom:5, marginTop:12 },
-  input: { width:'100%', padding:'9px 12px', border:'1px solid #ddd6c2', fontFamily:'Georgia,serif', fontSize:'0.85rem', color:'#052a1c', background:'#fdfbf6', outline:'none', boxSizing:'border-box' },
+  tabla: { width:'100%', borderCollapse:'collapse', background:'white', border:'1px solid #ebe7dc' },
+  th:    { fontFamily:'var(--font-marca)', fontSize:'0.72rem', fontWeight:'bold', color:'#2f6549', letterSpacing:'0.06em', textTransform:'uppercase', padding:'10px 14px', textAlign:'left', background:'#fbfaf6', borderBottom:'1px solid #ebe7dc' },
+  td:    { fontFamily:'var(--font-marca)', fontSize:'0.84rem', color:'#0f3c27', padding:'11px 14px', borderBottom:'1px solid #f6f3eb', verticalAlign:'middle' },
+  label: { display:'block', fontFamily:'var(--font-marca)', fontSize:'0.8rem', fontWeight:'bold', color:'#16422e', marginBottom:5, marginTop:12 },
+  input: { width:'100%', padding:'9px 12px', border:'1px solid #dcd8c9', fontFamily:'var(--font-marca)', fontSize:'0.85rem', color:'#0f3c27', background:'#fbfaf6', outline:'none', boxSizing:'border-box' },
 };
 
 function Modal({ categoria, onClose, onSave }) {
@@ -25,7 +25,7 @@ function Modal({ categoria, onClose, onSave }) {
 
   const guardar = async () => {
     if (!form.nombre.trim()) {
-      Swal.fire({ icon:'warning', title:'Falta el nombre', confirmButtonColor:'#052a1c' }); return;
+      Swal.fire({ icon:'warning', title:'Falta el nombre', confirmButtonColor:'#0f3c27' }); return;
     }
     setCargando(true);
     try {
@@ -33,16 +33,16 @@ function Modal({ categoria, onClose, onSave }) {
       else await api.post('/admin/categorias', form);
       onSave();
     } catch (err) {
-      Swal.fire({ icon:'error', title:'Error', text: err.response?.data?.mensaje || 'Error al guardar', confirmButtonColor:'#052a1c' });
+      Swal.fire({ icon:'error', title:'Error', text: err.response?.data?.mensaje || 'Error al guardar', confirmButtonColor:'#0f3c27' });
     } finally { setCargando(false); }
   };
 
   return (
     <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:100, display:'flex', alignItems:'flex-start', justifyContent:'center', padding:'2rem 1rem', overflowY:'auto' }}>
       <div style={{ background:'white', width:'100%', maxWidth:460, boxShadow:'0 20px 60px rgba(0,0,0,0.2)' }}>
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px', background:'#052a1c' }}>
-          <p style={{ fontFamily:'Georgia,serif', fontWeight:'bold', color:'#F5F0E1', margin:0 }}>{esEdicion ? 'Editar categoría' : 'Nueva categoría'}</p>
-          <button onClick={onClose} style={{ background:'none', border:'none', cursor:'pointer', color:'#6ec194' }}><X size={18} /></button>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px', background:'#0f3c27' }}>
+          <p style={{ fontFamily:'var(--font-marca)', fontWeight:'bold', color:'#f6f3eb', margin:0 }}>{esEdicion ? 'Editar categoría' : 'Nueva categoría'}</p>
+          <button onClick={onClose} style={{ background:'none', border:'none', cursor:'pointer', color:'#9dbfa9' }}><X size={18} /></button>
         </div>
         <div style={{ padding:'20px' }}>
           <label style={S.label}>Nombre *</label>
@@ -57,7 +57,7 @@ function Modal({ categoria, onClose, onSave }) {
           {esEdicion && (
             <label style={{ display:'flex', alignItems:'center', gap:8, marginTop:14, cursor:'pointer' }}>
               <input type="checkbox" checked={form.activa} onChange={e => set('activa', e.target.checked)} className="w-4 h-4 accent-verde-900" />
-              <span style={{ fontFamily:'Georgia,serif', fontSize:'0.85rem', color:'#0a3d28' }}>Categoría activa (visible en la tienda)</span>
+              <span style={{ fontFamily:'var(--font-marca)', fontSize:'0.85rem', color:'#16422e' }}>Categoría activa (visible en la tienda)</span>
             </label>
           )}
 
@@ -95,7 +95,7 @@ export default function AdminCategorias() {
       Swal.fire({ icon: 'success', title: res.data.mensaje, timer: 1800, showConfirmButton: false, toast: true, position: 'top-end' });
       cargar();
     } catch (err) {
-      Swal.fire({ icon: 'error', title: 'Error', text: err.response?.data?.mensaje || 'No se pudo eliminar', confirmButtonColor: '#052a1c' });
+      Swal.fire({ icon: 'error', title: 'Error', text: err.response?.data?.mensaje || 'No se pudo eliminar', confirmButtonColor: '#0f3c27' });
     }
   };
 
@@ -128,21 +128,21 @@ export default function AdminCategorias() {
               <tr key={c.id}>
                 <td style={S.td}>
                   <p style={{ fontWeight:'bold' }}>{c.nombre}</p>
-                  {c.descripcion && <p style={{ fontSize:'0.75rem', color:'#6ec194' }}>{c.descripcion}</p>}
+                  {c.descripcion && <p style={{ fontSize:'0.75rem', color:'#9dbfa9' }}>{c.descripcion}</p>}
                 </td>
-                <td style={S.td}><code style={{ fontSize:'0.78rem', color:'#6ec194' }}>{c.slug}</code></td>
+                <td style={S.td}><code style={{ fontSize:'0.78rem', color:'#9dbfa9' }}>{c.slug}</code></td>
                 <td style={S.td}>{c.total_productos}</td>
                 <td style={S.td}>
                   <span style={{
                     fontSize:'0.72rem', fontWeight:'bold', padding:'3px 9px', borderRadius:10,
-                    background: c.activa ? '#eefaf4' : '#F5F0E1', color: c.activa ? '#0f5535' : '#6ec194',
+                    background: c.activa ? '#f1f6f2' : '#f6f3eb', color: c.activa ? '#214f39' : '#9dbfa9',
                   }}>
                     {c.activa ? 'Activa' : 'Inactiva'}
                   </span>
                 </td>
                 <td style={S.td}>
                   <div style={{ display:'flex', gap:8 }}>
-                    <button onClick={() => setModal(c)} style={{ background:'none', border:'none', cursor:'pointer', color:'#146b42' }}><Pencil size={15} /></button>
+                    <button onClick={() => setModal(c)} style={{ background:'none', border:'none', cursor:'pointer', color:'#2f6549' }}><Pencil size={15} /></button>
                     <button onClick={() => eliminar(c)} style={{ background:'none', border:'none', cursor:'pointer', color:'#b91c1c' }}><Trash2 size={15} /></button>
                   </div>
                 </td>

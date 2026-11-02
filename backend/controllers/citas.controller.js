@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const pool = require('../config/db');
 const { enviarCitaConfirmadaCliente, enviarAlertaCitaNegocio, enviarPagoCitaConfirmado } = require('../config/email');
 const { notificarNuevaCita } = require('../config/whatsapp');
@@ -28,6 +29,18 @@ const generarSlots = (apertura, cierre, duracionMin) => {
   }
   return slots;
 };
+
+// Fecha y hora actuales en Colombia (el servidor puede estar en UTC).
+const ahoraBogota = () => {
+  const partes = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Bogota', year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', hourCycle: 'h23',
+  }).formatToParts(new Date());
+  const g = (t) => partes.find(p => p.type === t).value;
+  return { fecha: `${g('year')}-${g('month')}-${g('day')}`, minutos: Number(g('hour')) * 60 + Number(g('minute')) };
+};
+
+const POLITICA_CANCELACION = 'Las citas solo se pueden reprogramar (no hay devolución de dinero) y debe hacerse con mínimo 24 horas de anticipación.';
 
 const minutos = (horaStr) => {
   const [h, m] = horaStr.split(':').map(Number);
@@ -98,10 +111,11 @@ exports.obtenerDisponibilidad = async (req, res) => {
       });
     });
 
-    const hoy = new Date().toISOString().slice(0, 10);
-    if (fecha === hoy) {
-      const ahoraMin = new Date().getHours() * 60 + new Date().getMinutes();
-      disponibles = disponibles.filter(slot => minutos(slot) > ahoraMin);
+    const ahora = ahoraBogota();
+    if (fecha < ahora.fecha) {
+      disponibles = [];
+    } else if (fecha === ahora.fecha) {
+      disponibles = disponibles.filter(slot => minutos(slot) > ahora.minutos);
     }
 
     res.json({ ok: true, horarios: disponibles, duracion_minutos: duracion });
@@ -116,9 +130,15 @@ exports.obtenerDisponibilidad = async (req, res) => {
 // Ahora la cita solo queda CONFIRMADA cuando Wompi confirma el pago
 // (ver confirmarPagoCita, que llama el webhook de pagos).
 exports.iniciarPagoCita = async (req, res) => {
-  const { servicio_id, nombre, email, telefono, fecha, hora, notas } = req.body;
+  const { servicio_id, nombre, email, telefono, fecha, hora, notas, acepta_politica } = req.body;
   if (!servicio_id || !nombre || !email || !telefono || !fecha || !hora) {
     return res.status(400).json({ ok: false, mensaje: 'Todos los campos son requeridos' });
+  }
+  if (acepta_politica !== true) {
+    return res.status(400).json({ ok: false, mensaje: 'Debes aceptar la política de cancelación y reprogramación' });
+  }
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha) || !/^\d{1,2}:\d{2}/.test(hora)) {
+    return res.status(400).json({ ok: false, mensaje: 'Fecha u hora inválida' });
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return res.status(400).json({ ok: false, mensaje: 'Email inválido' });
@@ -138,6 +158,16 @@ exports.iniciarPagoCita = async (req, res) => {
     const horaInicio = `${pad(Math.floor(inicioMin / 60))}:${pad(inicioMin % 60)}:00`;
     const horaFin = `${pad(Math.floor(finMin / 60))}:${pad(finMin % 60)}:00`;
 
+    // El horario debe ser futuro, de un dia con atencion y dentro de ese horario.
+    const ahoraC = ahoraBogota();
+    if (fecha < ahoraC.fecha || (fecha === ahoraC.fecha && inicioMin <= ahoraC.minutos)) {
+      return res.status(400).json({ ok: false, mensaje: 'Ese horario ya pasó, elige otro.' });
+    }
+    const horarioDia = await obtenerHorarioDia(new Date(`${fecha}T00:00:00`).getDay());
+    if (!horarioDia.activo || inicioMin < minutos(horarioDia.hora_apertura) || finMin > minutos(horarioDia.hora_cierre)) {
+      return res.status(400).json({ ok: false, mensaje: 'Ese horario está fuera del horario de atención.' });
+    }
+
     const { rows: conflictos } = await pool.query(
       `SELECT id FROM citas
        WHERE fecha = $1
@@ -154,14 +184,14 @@ exports.iniciarPagoCita = async (req, res) => {
     const currency = 'COP';
     const signature = firmarIntegridad(reference, amountInCents, currency);
     const pagoExpira = new Date(Date.now() + MINUTOS_PARA_PAGAR * 60 * 1000);
-    const usuarioId = req.usuario?.id || null; // si esta logueado, vinculamos la cita a su cuenta
+    const tokenGestion = crypto.randomBytes(24).toString('hex'); // enlace privado para ver/reprogramar la cita
 
     const { rows } = await pool.query(
       `INSERT INTO citas (servicio_id, nombre_cliente, email_cliente, telefono_cliente,
-                           fecha, hora_inicio, hora_fin, notas, estado, wompi_reference, pago_expira, usuario_id)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,'pendiente_pago',$9,$10,$11)
+                           fecha, hora_inicio, hora_fin, notas, estado, wompi_reference, pago_expira, token_gestion, politica_aceptada)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,'pendiente_pago',$9,$10,$11,TRUE)
        RETURNING id`,
-      [servicio_id, nombre, email, telefono, fecha, horaInicio, horaFin, notas || null, reference, pagoExpira, usuarioId]
+      [servicio_id, nombre, email, telefono, fecha, horaInicio, horaFin, notas || null, reference, pagoExpira, tokenGestion]
     );
 
     res.status(201).json({
@@ -190,7 +220,7 @@ exports.confirmarPagoCita = async (reference, transaccion) => {
             wompi_transaction_id = $2, actualizado_en = NOW()
      WHERE wompi_reference = $3 AND estado != 'confirmada'
      RETURNING id, servicio_id, nombre_cliente, email_cliente, telefono_cliente,
-               fecha, hora_inicio, hora_fin, notas, monto_pagado`,
+               fecha, hora_inicio, hora_fin, notas, monto_pagado, token_gestion`,
     [transaccion.amount_in_cents / 100, transaccion.id, reference]
   );
   const cita = rows[0];
@@ -222,41 +252,47 @@ exports.cancelarPagoCita = async (reference) => {
   ).catch(err => console.error('Error cancelando pago de cita:', err));
 };
 
-// ─── GET /api/citas/mis-citas (cliente autenticado) ─────────
-exports.misCitas = async (req, res) => {
+// ─── GET /api/citas/gestion/:token  (enlace privado del correo) ─────────
+exports.verCitaGestion = async (req, res) => {
   try {
     const { rows } = await pool.query(
-      `SELECT c.id, c.fecha, c.hora_inicio, c.hora_fin, c.estado, c.notas, c.servicio_id,
-              s.nombre AS servicio_nombre, s.duracion_minutos
+      `SELECT c.id, c.servicio_id, to_char(c.fecha,'YYYY-MM-DD') AS fecha, c.hora_inicio, c.hora_fin, c.estado, c.nombre_cliente,
+              s.nombre AS servicio_nombre, s.duracion_minutos,
+              (((c.fecha + c.hora_inicio) AT TIME ZONE 'America/Bogota') - NOW() >= INTERVAL '24 hours') AS puede_reprogramar
        FROM citas c JOIN servicios_masaje s ON s.id = c.servicio_id
-       WHERE c.usuario_id = $1 AND c.estado IN ('confirmada','pendiente_pago')
-       ORDER BY c.fecha, c.hora_inicio`,
-      [req.usuario.id]
+       WHERE c.token_gestion = $1`,
+      [req.params.token]
     );
-    res.json({ ok: true, citas: rows });
+    if (!rows[0]) return res.status(404).json({ ok: false, mensaje: 'No encontramos esta cita' });
+    res.json({ ok: true, cita: rows[0], politica: POLITICA_CANCELACION });
   } catch (err) {
-    console.error('Error misCitas:', err);
-    res.status(500).json({ ok: false, mensaje: 'Error al obtener tus citas' });
+    console.error('Error verCitaGestion:', err);
+    res.status(500).json({ ok: false, mensaje: 'Error al consultar la cita' });
   }
 };
 
-// ─── PATCH /api/citas/:id/reprogramar (cliente, dueño de la cita) ─
+// ─── PATCH /api/citas/gestion/:token/reprogramar ─
 exports.reprogramarCita = async (req, res) => {
-  const { id } = req.params;
   const { fecha, hora } = req.body;
   if (!fecha || !hora) return res.status(400).json({ ok: false, mensaje: 'fecha y hora son requeridas' });
 
   try {
     const citaRes = await pool.query(
-      `SELECT c.*, s.duracion_minutos, s.nombre AS servicio_nombre
+      `SELECT c.*, s.duracion_minutos, s.nombre AS servicio_nombre,
+              (((c.fecha + c.hora_inicio) AT TIME ZONE 'America/Bogota') - NOW() >= INTERVAL '24 hours') AS puede_reprogramar
        FROM citas c JOIN servicios_masaje s ON s.id = c.servicio_id
-       WHERE c.id = $1 AND c.usuario_id = $2`,
-      [id, req.usuario.id]
+       WHERE c.token_gestion = $1`,
+      [req.params.token]
     );
     const cita = citaRes.rows[0];
+    const id = cita?.id;
     if (!cita) return res.status(404).json({ ok: false, mensaje: 'Cita no encontrada' });
     if (cita.estado !== 'confirmada') {
       return res.status(400).json({ ok: false, mensaje: 'Solo puedes reprogramar una cita confirmada' });
+    }
+
+    if (!cita.puede_reprogramar) {
+      return res.status(400).json({ ok: false, mensaje: 'Ya no es posible reprogramar: la cita empieza en menos de 24 horas. ' + POLITICA_CANCELACION });
     }
 
     const diaSemana = new Date(`${fecha}T00:00:00`).getDay();
@@ -271,6 +307,10 @@ exports.reprogramarCita = async (req, res) => {
 
     if (inicioMin < minutos(horario.hora_apertura) || finMin > minutos(horario.hora_cierre)) {
       return res.status(400).json({ ok: false, mensaje: 'Ese horario está fuera del horario de atención' });
+    }
+    const ahoraR = ahoraBogota();
+    if (fecha < ahoraR.fecha || (fecha === ahoraR.fecha && inicioMin <= ahoraR.minutos)) {
+      return res.status(400).json({ ok: false, mensaje: 'Ese horario ya pasó, elige otro.' });
     }
 
     const { rows: conflictos } = await pool.query(

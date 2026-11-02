@@ -61,9 +61,9 @@ const getDatosReporte = async (periodo) => {
 
     // Clientes nuevos
     pool.query(`
-      SELECT COUNT(*)::int AS nuevos
-      FROM usuarios
-      WHERE rol_id = 2 AND creado_en >= $1 AND creado_en <= $2
+      SELECT COUNT(DISTINCT LOWER(email_cliente))::int AS nuevos
+      FROM pedidos
+      WHERE email_cliente IS NOT NULL AND creado_en >= $1 AND creado_en <= $2
     `, [desde, hasta]),
   ]);
 
@@ -323,7 +323,7 @@ const descargarPDF = async (req, res) => {
 
     // ── Pie de pagina ──────────────────────────────────
     doc.fontSize(8).fillColor(GRIS).font('Helvetica')
-       .text(`Generado el ${new Date().toLocaleDateString('es-CO', { year:'numeric', month:'long', day:'numeric' })} · Yerbateras · Certificado INVIMA`, 50, 780, { align:'center', width: W });
+       .text(`Generado el ${new Date().toLocaleDateString('es-CO', { year:'numeric', month:'long', day:'numeric' })} · Yerbateras`, 50, 780, { align:'center', width: W });
 
     doc.end();
   } catch (err) {
