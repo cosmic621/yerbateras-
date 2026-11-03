@@ -272,7 +272,7 @@ const enviarPagoCitaConfirmado = async (email, nombre, cita) => {
       <p style="margin:4px 0"><strong>💳 Monto pagado:</strong> $${Number(cita.monto_pagado).toLocaleString('es-CO')} COP</p>
     </div>
     <p>Te esperamos. <strong>Política de cancelación:</strong> la cita solo se puede reprogramar (no hay devolución de dinero) y debe hacerse con <strong>mínimo 24 horas</strong> de anticipación, escribiéndonos o desde este enlace privado:</p>
-    ${cita.token_gestion ? `<p><a href="${process.env.FRONTEND_URL || ''}/cita/${cita.token_gestion}" style="color:#0f3c27">Ver o reprogramar mi cita</a></p>` : ''}
+    ${cita.token_gestion ? `<p><a href="${BASE_URL}/cita/${cita.token_gestion}" style="color:#0f3c27">Ver o reprogramar mi cita</a></p>` : ''}
     <hr class="divider">
     <p style="font-size:13px;color:#888">Gracias por confiar en Yerbateras.</p>
   `);

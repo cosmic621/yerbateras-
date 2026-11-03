@@ -1,5 +1,12 @@
 # Cambios de esta versión
 
+## Primeros pasos (para empezar a cargar productos)
+1. Crear tu usuario administrador: `cd backend && node scripts/crear-admin.js correo@ejemplo.com "Tu Nombre" "UnaContraseñaLarga"`
+2. Entrar a `/admin` con ese correo y contraseña.
+3. Admin → Categorías (crear primero) → Productos y kits → Nuevo producto.
+4. Logo: guardar `logo.svg` o `logo.png` en `frontend/public/` y aparece en el menú.
+
+
 ## Para ponerlo en marcha
 1. Base de datos: `psql -d yerbateras -f backend/sql/mejoras-v4.sql` (se puede correr más de una vez).
 2. `npm install` en `backend/` y `frontend/`, igual que antes. No hay variables de entorno nuevas

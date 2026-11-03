@@ -8,11 +8,22 @@ const enlace = 'text-[1.08rem] text-verde-900 hover:text-dorado-600 transition-c
 const colTitulo = 'text-sm uppercase tracking-[0.18em] text-dorado-600 mb-3';
 const itemMenu = 'block py-1 text-[1.05rem] text-verde-800 hover:text-dorado-600 transition-colors';
 
+// Logo de la marca: pon tu archivo en frontend/public/logo.svg (o logo.png) y aparece solo.
+// Mientras no exista, se muestra el nombre escrito.
+const LOGOS = ['/logo.svg', '/logo.png'];
+
 function Logo() {
+  const [n, setN] = useState(0);   // qué archivo se está probando; LOGOS.length = ninguno existe
   return (
     <Link to="/" aria-label="Yerbateras, inicio" className="flex flex-col items-center leading-none select-none">
-      <Leaf size={14} className="text-dorado-600 mb-1" strokeWidth={1.6} />
-      <span className="text-[1.55rem] tracking-[0.32em] text-verde-900 pl-[0.32em]">YERBATERAS</span>
+      {n < LOGOS.length ? (
+        <img src={LOGOS[n]} alt="Yerbateras" onError={() => setN(n + 1)} className="h-12 w-auto max-w-[220px] object-contain" />
+      ) : (
+        <>
+          <Leaf size={14} className="text-dorado-600 mb-1" strokeWidth={1.6} />
+          <span className="text-[1.55rem] tracking-[0.32em] text-verde-900 pl-[0.32em]">YERBATERAS</span>
+        </>
+      )}
     </Link>
   );
 }

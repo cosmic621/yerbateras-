@@ -1,0 +1,6 @@
+Pon aquí el logo de Yerbateras con uno de estos nombres exactos:
+
+  logo.svg   (lo mejor: se ve nítido en cualquier pantalla)
+  logo.png   (fondo transparente, mínimo 600 px de ancho)
+
+Aparece solo en el menú de la web. Opcional: favicon.png para el ícono de la pestaña.
