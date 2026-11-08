@@ -118,6 +118,7 @@ exports.iniciarInscripcion = async (req, res) => {
       [insc.rows[0].id, reference, montoAPagar]
     );
     await client.query('COMMIT');
+    if (process.env.NODE_ENV !== 'production') console.log(`🧾 Inscripción a taller creada. Para simular el pago: node scripts/simular-pago.js ${reference}`);
 
     res.status(201).json({
       ok: true,

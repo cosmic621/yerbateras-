@@ -70,6 +70,7 @@ const crearPedido = async (req, res) => {
       );
     }
     await client.query('COMMIT');
+    if (process.env.NODE_ENV !== 'production') console.log(`🧾 Pedido ${pedido.rows[0].numero_pedido} creado. Para simular el pago: node scripts/simular-pago.js ${reference}`);
 
     // El correo es solo un dato del pago. La suscripción es opcional y la decide la clienta.
     if (suscribir_newsletter === true) {

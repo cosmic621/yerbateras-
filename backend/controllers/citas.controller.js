@@ -193,6 +193,7 @@ exports.iniciarPagoCita = async (req, res) => {
        RETURNING id`,
       [servicio_id, nombre, email, telefono, fecha, horaInicio, horaFin, notas || null, reference, pagoExpira, tokenGestion]
     );
+    if (process.env.NODE_ENV !== 'production') console.log(`🧾 Cita reservada. Para simular el pago: node scripts/simular-pago.js ${reference}`);
 
     res.status(201).json({
       ok: true,

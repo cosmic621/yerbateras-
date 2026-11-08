@@ -53,6 +53,13 @@ app.get('/health', (req, res) =>
 );
 
 app.use((err, req, res, next) => {
+  // Errores de subida de archivos: mensajes claros en español
+  if (err.name === 'MulterError') {
+    const msg = err.code === 'LIMIT_FILE_SIZE' ? 'La imagen pesa demasiado (máximo 10 MB). Redúcela o expórtala en menor calidad.'
+      : err.code === 'LIMIT_UNEXPECTED_FILE' ? 'El archivo se envió en un campo que no corresponde.'
+      : 'No se pudo subir el archivo.';
+    return res.status(400).json({ ok: false, mensaje: msg });
+  }
   console.error('Error:', err.stack);
   res.status(err.status || 500).json({ ok:false, mensaje: err.message || 'Error interno' });
 });

@@ -7,6 +7,20 @@
 4. Logo: guardar `logo.svg` o `logo.png` en `frontend/public/` y aparece en el menú.
 
 
+## Pagos con Wompi
+1. En Wompi (modo pruebas): Desarrollo → Programadores. Copiar llave pública (`pub_test_`), secreto de integridad (`test_integrity_`) y secreto de eventos (`test_events_`) a `backend/.env`.
+2. `cd backend && node scripts/verificar-wompi.js` revisa que las llaves estén completas y sean del mismo ambiente.
+3. Probar en la web con tarjeta `4242 4242 4242 4242` (aprobada) o `4111 1111 1111 1111` (rechazada).
+4. En tu computador Wompi no puede avisar a `localhost`: `node scripts/simular-pago.js <referencia>` envía el aviso firmado (la referencia sale en la terminal del backend).
+5. En producción: llaves `pub_prod_` / `prod_integrity_` / `prod_events_` y, en el dashboard de Wompi (modo producción), la URL de eventos `https://TU-DOMINIO/api/pagos/webhook`.
+
+## Imágenes (corrección)
+- Las imágenes se guardan como `/uploads/archivo.jpg` y las sirve el backend. El frontend ahora las pide al backend
+  (`src/utils/urls.js` + `src/services/api.js`); en producción hay que fijar `VITE_API_URL` con la dirección real del API
+  al hacer el `build` del frontend (ej. `https://api.tudominio.com/api`).
+- Subidas: límite de 10 MB, la carpeta `backend/uploads` se crea sola, y los errores (muy pesada, HEIC de iPhone, formato) salen en español.
+- Si cambias `vite.config.js` hay que reiniciar `npm run dev`.
+
 ## Para ponerlo en marcha
 1. Base de datos: `psql -d yerbateras -f backend/sql/mejoras-v4.sql` (se puede correr más de una vez).
 2. `npm install` en `backend/` y `frontend/`, igual que antes. No hay variables de entorno nuevas

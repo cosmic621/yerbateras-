@@ -3,7 +3,6 @@ import { Plus, Pencil, Eye, EyeOff, Search, X } from 'lucide-react';
 import AdminSidebar from '../../components/admin/AdminSidebar';
 import api from '../../services/api';
 import Swal from 'sweetalert2';
-import { imageUrl } from '../../utils/imageUrl';
 
 const S = {
   h1:    { fontFamily:'var(--font-marca)', fontSize:'1.4rem', fontWeight:'bold', color:'#0f3c27', margin:0 },
@@ -246,11 +245,7 @@ export default function AdminProductos() {
                     <div style={{display:'flex', alignItems:'center', gap:10}}>
                       <div style={{width:36, height:36, background:'#f6f3eb', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, overflow:'hidden'}}>
                         {p.imagen_principal
-                          ? <img
-                              src={imageUrl(p.imagen_principal)}
-                              alt=""
-                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                            />
+                          ? <img src={p.imagen_principal} alt="" style={{width:'100%', height:'100%', objectFit:'cover'}} />
                           : <span style={{fontFamily:'var(--font-marca)', color:'#c5d9cb', fontSize:'0.8rem', fontStyle:'italic'}}>Y</span>}
                       </div>
                       <div>
